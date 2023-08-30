@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "instalike-photosharing"
+version = "0.1.0"
+description = ""
+authors = ["Team 6"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pydantic = "^2.3.0"
+pydantic-settings = "^2.0.3"
+fastapi = "^0.103.0"
+sqlalchemy = "^2.0.20"
+asyncpg = "^0.28.0"
+alembic = "^1.11.3"
+uvicorn = {extras = ["standart"], version = "^0.23.2"}
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
