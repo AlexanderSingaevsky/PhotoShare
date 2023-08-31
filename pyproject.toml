@@ -15,6 +15,7 @@ sqlalchemy = "^2.0.20"
 asyncpg = "^0.28.0"
 alembic = "^1.11.3"
 uvicorn = {extras = ["standart"], version = "^0.23.2"}
+redis = "^5.0.0"
 
 
 [build-system]

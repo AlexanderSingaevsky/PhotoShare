@@ -1,1 +1,0 @@
-# Redis connector should be there

@@ -1,0 +1,49 @@
+
+
+import asyncio
+
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession
+
+
+from src.database.sql.alchemy_models import Base
+from src.config import settings
+
+
+class Postgres:
+    def __init__(self):
+        user = settings.postgres_user
+        pwd = settings.postgres_password
+        host = settings.postgres_host
+        port = settings.postgres_port
+        database = settings.postgres_db
+        url = f'postgresql+asyncpg://{user}:{pwd}@{host}:{port}/{database}?async_fallback=True'
+
+        self.engine = create_async_engine(url, echo=False)
+        self.async_session = async_sessionmaker(self.engine, expire_on_commit=False)
+        print('POSTGRES_CONNECTOR_INITIALIZED')
+
+    async def __call__(self):
+        async with self.async_session() as session:
+            yield session
+
+    async def create_database(self):
+        async with self.engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+
+    async def drop_database(self):
+        async with self.engine.begin() as conn:
+            await conn.run_sync(Base.metadata.drop_all)
+
+
+database = Postgres()
+
+
+async def main():
+    db = Postgres()
+    await db.create_database()
+
+
+if __name__ == '__main__':
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+    asyncio.run(main())

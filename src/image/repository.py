@@ -1,1 +1,1 @@
-# image queries here
+# image related queries here
