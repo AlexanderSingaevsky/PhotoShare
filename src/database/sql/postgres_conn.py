@@ -1,12 +1,11 @@
-
-
 import asyncio
 
+from fastapi import Depends
+from fastapi_users_db_sqlalchemy import SQLAlchemyUserDatabase
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from sqlalchemy.ext.asyncio import AsyncSession
 
-
-from src.database.sql.alchemy_models import Base
+from src.database.sql.alchemy_models import Base, User
 from src.config import settings
 
 
@@ -37,6 +36,10 @@ class Postgres:
 
 
 database = Postgres()
+
+
+async def get_user_db(session: AsyncSession = Depends(database)):
+    yield SQLAlchemyUserDatabase(session, User)
 
 
 async def main():

@@ -9,6 +9,7 @@ from src.database.sql.postgres_conn import database
 from src.database.cache.redis_conn import cache_database
 
 from src.image.routes import router as images
+from src.auth.routes import router as auth
 
 app = FastAPI()
 
@@ -28,6 +29,8 @@ async def healthchecker(db: AsyncSession = Depends(database), cache: Redis = Dep
     await cache.set("1", 1)
     return {"message": "Databases are OK!"}
 
+app.include_router(auth)
+
 
 if __name__ == '__main__':
-    uvicorn.run(app, host="localhost", port=8000)
+    uvicorn.run(app, host="localhost", port=8080)
