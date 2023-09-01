@@ -17,7 +17,7 @@ class Postgres:
         host = settings.postgres_host
         port = settings.postgres_port
         database = settings.postgres_db
-        url = f'postgresql+asyncpg://{user}:{pwd}@{host}:{port}/{database}?async_fallback=True'
+        url = f'postgresql+asyncpg://postgres:88888888@localhost:5432/photo'
 
         self.engine = create_async_engine(url, echo=False)
         self.async_session = async_sessionmaker(self.engine, expire_on_commit=False)
