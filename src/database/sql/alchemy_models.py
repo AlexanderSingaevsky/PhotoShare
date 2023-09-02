@@ -1,6 +1,4 @@
 from datetime import date
-
-from datetime import datetime
 from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTableUUID, SQLAlchemyBaseOAuthAccountTableUUID
 from sqlalchemy import String, Integer, DateTime, Boolean, func
 from sqlalchemy.orm import DeclarativeBase, relationship, Mapped, mapped_column
@@ -18,7 +16,8 @@ class OAuthAccount(SQLAlchemyBaseOAuthAccountTableUUID, Base):
 
 class User(SQLAlchemyBaseUserTableUUID, Base):
     username: Mapped[str] = mapped_column(String(50), nullable=False)
-    access_level: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    access_level: Mapped[int] = mapped_column(Integer, ForeignKey('permissions.id'), default=1)
+    permission = relationship("Permission", back_populates="users", lazy='joined')
     created_at: Mapped[DateTime] = mapped_column('crated_at', DateTime, default=func.now())
     oauth_accounts: Mapped[list[OAuthAccount]] = relationship("OAuthAccount", lazy="joined")
 
@@ -37,6 +36,7 @@ class Permission(Base):
 
     can_update_comment: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     can_delete_comment: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+
 
 #####___________COMMENTS MODELS____START___#################
 class Comment(Base):
