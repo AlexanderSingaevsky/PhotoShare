@@ -11,7 +11,6 @@ class Settings(BaseSettings):
     postgres_password: str = Field()
     postgres_port: int = Field()
     postgres_host: str = Field()
-    sqlalchemy_database_url: str = Field()
 
     redis_host: str = Field()
     redis_port: str = Field()

@@ -1,18 +1,24 @@
+import os
 import uuid
 from typing import Optional
 
 from fastapi import Depends, Request
 from fastapi_users import BaseUserManager, FastAPIUsers, UUIDIDMixin
-from fastapi_users.authentication import (
-    AuthenticationBackend,
-    BearerTransport,
-    JWTStrategy,
-)
-from fastapi_users.db import SQLAlchemyUserDatabase
+from fastapi_users.authentication import AuthenticationBackend, BearerTransport, JWTStrategy
 
+from fastapi_users.db import SQLAlchemyUserDatabase
+from httpx_oauth.clients.google import GoogleOAuth2
+
+from src.config import settings
 from src.database.sql.postgres_conn import User, get_user_db
 
-SECRET = "SECRET"
+# should be remade to get it from .env
+google_oauth_client = GoogleOAuth2(
+    os.getenv("GOOGLE_OAUTH_CLIENT_ID", ""),
+    os.getenv("GOOGLE_OAUTH_CLIENT_SECRET", ""),
+)
+
+SECRET = settings.secret_key
 
 
 class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
@@ -41,7 +47,7 @@ bearer_transport = BearerTransport(tokenUrl="auth/jwt/login")
 
 
 def get_jwt_strategy() -> JWTStrategy:
-    return JWTStrategy(secret=SECRET, lifetime_seconds=3600)
+    return JWTStrategy(secret=settings.secret_key, lifetime_seconds=3600)
 
 
 auth_backend = AuthenticationBackend(

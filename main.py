@@ -15,6 +15,7 @@ from src.auth.routes import router as auth
 
 app = FastAPI()
 
+app.include_router(auth)
 app.include_router(images, prefix='/api')
 
 
@@ -32,7 +33,7 @@ async def healthchecker(db: AsyncSession = Depends(database), cache: Redis = Dep
     return {"message": "Databases are OK!"}
 
 
-app.include_router(auth)
+
 
 
 @app.get("/authenticated-route")

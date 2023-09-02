@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
 from src.auth.schemas import UserRead, UserCreate, UserUpdate
-from src.auth.service import auth_backend, fastapi_users
+from src.auth.service import auth_backend, fastapi_users, google_oauth_client, SECRET
 
 router = APIRouter()
 
@@ -27,6 +27,12 @@ router.include_router(
     fastapi_users.get_users_router(UserRead, UserUpdate),
     prefix="/users",
     tags=["users"],
+)
+
+router.include_router(
+    fastapi_users.get_oauth_router(google_oauth_client, auth_backend, SECRET),
+    prefix="/auth/google",
+    tags=["auth"],
 )
 
 
