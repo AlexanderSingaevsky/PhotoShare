@@ -4,12 +4,14 @@ from fastapi_users import schemas
 
 
 class UserRead(schemas.BaseUser[uuid.UUID]):
-    pass
+    username: str
+    access_level: int
 
 
 class UserCreate(schemas.BaseUserCreate):
-    pass
+    username: str
+    access_level: int
 
 
-class UserUpdate(schemas.BaseUserUpdate):
+class UserUpdate(UserCreate):
     pass

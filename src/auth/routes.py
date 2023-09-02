@@ -24,15 +24,13 @@ router.include_router(
     tags=["auth"],
 )
 router.include_router(
-    fastapi_users.get_users_router(UserRead, UserUpdate),
-    prefix="/users",
-    tags=["users"],
-)
-
-router.include_router(
     fastapi_users.get_oauth_router(google_oauth_client, auth_backend, SECRET),
     prefix="/auth/google",
     tags=["auth"],
 )
-
+router.include_router(
+    fastapi_users.get_users_router(UserRead, UserUpdate),
+    prefix="/user",
+    tags=["user"],
+)
 

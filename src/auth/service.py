@@ -19,6 +19,7 @@ google_oauth_client = GoogleOAuth2(
 )
 
 SECRET = settings.secret_key
+bearer_transport = BearerTransport(tokenUrl="auth/jwt/login")
 
 
 class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
@@ -43,9 +44,6 @@ async def get_user_manager(user_db: SQLAlchemyUserDatabase = Depends(get_user_db
     yield UserManager(user_db)
 
 
-bearer_transport = BearerTransport(tokenUrl="auth/jwt/login")
-
-
 def get_jwt_strategy() -> JWTStrategy:
     return JWTStrategy(secret=settings.secret_key, lifetime_seconds=3600)
 
@@ -58,4 +56,5 @@ auth_backend = AuthenticationBackend(
 
 fastapi_users = FastAPIUsers[User, uuid.UUID](get_user_manager, [auth_backend])
 
+#add cache
 current_active_user = fastapi_users.current_user(active=True)

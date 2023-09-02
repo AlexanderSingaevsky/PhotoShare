@@ -19,10 +19,16 @@ if config.config_file_name is not None:
 
 # add your model's MetaData object here
 # for 'autogenerate' support
-# from myapp import mymodel
-# target_metadata = mymodel.Base.metadata
+# from myapp import my model
+# target_metadata = my model.Base.metadata
 target_metadata = Base.metadata
-config.set_main_option("sqlalchemy.url", settings.sqlalchemy_database_url)
+user = settings.postgres_user
+pwd = settings.postgres_password
+host = settings.postgres_host
+port = settings.postgres_port
+database = settings.postgres_db
+url = f'postgresql+asyncpg://{user}:{pwd}@{host}:{port}/{database}?async_fallback=True'
+config.set_main_option("sqlalchemy.url", url)
 
 
 # other values from the config, defined by the needs of env.py,
