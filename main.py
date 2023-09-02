@@ -5,13 +5,17 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 from redis.asyncio.client import Redis
 
+from src.auth.service import current_active_user
+from src.database.sql.alchemy_models import User
 from src.database.sql.postgres_conn import database
 from src.database.cache.redis_conn import cache_database
 
 from src.image.routes import router as images
+from src.auth.routes import router as auth
 
 app = FastAPI()
 
+app.include_router(auth)
 app.include_router(images, prefix='/api')
 
 
@@ -29,5 +33,13 @@ async def healthchecker(db: AsyncSession = Depends(database), cache: Redis = Dep
     return {"message": "Databases are OK!"}
 
 
+
+
+
+@app.get("/authenticated-route")
+async def authenticated_route(user: User = Depends(current_active_user)):
+    return {"message": f"Hello {user.email}!"}
+
+
 if __name__ == '__main__':
-    uvicorn.run(app, host="localhost", port=8000)
+    uvicorn.run(app, host="localhost", port=8080)
