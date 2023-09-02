@@ -1,9 +1,13 @@
-from fastapi import APIRouter
+from pathlib import Path
+
+from fastapi import APIRouter, Request
+from fastapi.templating import Jinja2Templates
 
 from src.auth.schemas import UserRead, UserCreate, UserUpdate
 from src.auth.service import auth_backend, fastapi_users, google_oauth_client, SECRET
 
 router = APIRouter()
+templates = Jinja2Templates(directory=Path(__file__).parent.parent.parent / 'templates')
 
 router.include_router(
     fastapi_users.get_auth_router(auth_backend), prefix="/auth/jwt", tags=["auth"]
@@ -34,3 +38,9 @@ router.include_router(
     tags=["user"],
 )
 
+
+@router.get("/auth/set_new_password/{token}", tags=["auth"]
+            # dependencies=[Depends(RateLimiter(times=1, hours=1))]
+            )
+async def reset_password_form(request: Request):
+    return templates.TemplateResponse("reset_password_form.html", {"request": request})

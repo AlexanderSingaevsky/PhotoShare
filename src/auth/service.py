@@ -9,6 +9,7 @@ from fastapi_users.authentication import AuthenticationBackend, BearerTransport,
 from fastapi_users.db import SQLAlchemyUserDatabase
 from httpx_oauth.clients.google import GoogleOAuth2
 
+from src.auth.utils.email import send_email_for_reset_pswd
 from src.config import settings
 from src.database.sql.postgres_conn import User, get_user_db
 
@@ -32,7 +33,10 @@ class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
     async def on_after_forgot_password(
             self, user: User, token: str, request: Optional[Request] = None
     ):
+        await send_email_for_reset_pswd(user.email, user.username, token, request.base_url)
+
         print(f"User {user.id} has forgot their password. Reset token: {token}")
+
 
     async def on_after_request_verify(
             self, user: User, token: str, request: Optional[Request] = None
