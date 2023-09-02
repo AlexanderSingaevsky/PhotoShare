@@ -12,11 +12,13 @@ from src.database.cache.redis_conn import cache_database
 
 from src.image.routes import router as images
 from src.auth.routes import router as auth
+from src.comment.routes import router as comments
 
 app = FastAPI()
 
 app.include_router(auth)
 app.include_router(images, prefix='/api')
+app.include_router(comments, prefix='/api')
 
 
 @app.get("/")
