@@ -24,7 +24,7 @@ def read_root():
     return {"message": "Hello World"}
 
 
-@app.get("/api/healthchecker")
+@app.get("/example/healthchecker")
 async def healthchecker(db: AsyncSession = Depends(database), cache: Redis = Depends(cache_database)):
     print('postgres connection check...')
     await db.execute(text("SELECT 1"))
@@ -33,10 +33,7 @@ async def healthchecker(db: AsyncSession = Depends(database), cache: Redis = Dep
     return {"message": "Databases are OK!"}
 
 
-
-
-
-@app.get("/authenticated-route")
+@app.get("/example/user-authenticated")
 async def authenticated_route(user: User = Depends(current_active_user)):
     return {"message": f"Hello {user.email}!"}
 

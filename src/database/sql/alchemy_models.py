@@ -19,8 +19,7 @@ class User(SQLAlchemyBaseUserTableUUID, Base):
     oauth_accounts: Mapped[list[OAuthAccount]] = relationship("OAuthAccount", lazy="joined")
       
       
-class Tag(Base):
-    """Represents a tag associated with posts."""
-    __tablename__ = "tags"
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, unique=True, index=True, nullable=False)
+# class Tag(Base):
+#     __tablename__ = "tags"
+#     id: Mapped[int] = mapped_column(Integer, primary_key=True)
+#     name: Mapped[str] = mapped_column(String(50), unique=True, index=True, nullable=False)
