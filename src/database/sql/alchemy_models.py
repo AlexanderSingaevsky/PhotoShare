@@ -1,6 +1,7 @@
+import uuid
 from datetime import datetime
 from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTableUUID, SQLAlchemyBaseOAuthAccountTableUUID
-from sqlalchemy import String, Integer, DateTime, Boolean, func
+from sqlalchemy import String, Integer, DateTime, Boolean, func, Uuid
 from sqlalchemy.orm import DeclarativeBase, relationship, Mapped, mapped_column
 from sqlalchemy.sql.schema import ForeignKey
 from sqlalchemy.ext.asyncio import AsyncAttrs
@@ -20,6 +21,7 @@ class User(SQLAlchemyBaseUserTableUUID, Base):
     permission = relationship("Permission", back_populates="users", lazy='joined')
     created_at: Mapped[DateTime] = mapped_column('crated_at', DateTime, default=func.now())
     oauth_accounts: Mapped[list[OAuthAccount]] = relationship("OAuthAccount", lazy="joined")
+    images = relationship("Image",  back_populates="owner", lazy='joined')
 
 
 class Permission(Base):
@@ -47,3 +49,12 @@ class Comment(Base):
     updated_at: Mapped[datetime] = mapped_column('updated_at', DateTime, default=func.now(), onupdate=func.now(), nullable=True)
 
 
+class Image(Base):
+    __tablename__ = 'images'
+    id: Mapped[int] = mapped_column(primary_key=True)
+    owner: Mapped[User] = relationship("User", back_populates="images", lazy='noload')
+    owner_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey('user.id'))
+    title: Mapped[str] = mapped_column(String(30), nullable=True, default=None)
+    cloudinary_url: Mapped[str] = mapped_column(String(300), nullable=False, default='placeholder')
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=None, onupdate=func.now(), nullable=True)

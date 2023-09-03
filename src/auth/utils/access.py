@@ -16,7 +16,7 @@ class Comment:
 
 
 class AccessService:
-    async def __call__(self, action: str, user: User, item: Image | Tag | Comment) -> None:
+    async def __call__(self, action: str, user: User, item: Image | Tag | Comment | None = None) -> None:
         # add items when they will be ready
         if user.is_superuser or user.permission.__dict__.get(action, False):
             return None
