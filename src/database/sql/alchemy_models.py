@@ -14,7 +14,7 @@ class User(Base):
     username: Mapped[str] = mapped_column(String(50))
 
 
-class DBImage(Base):
+class ImageResponse(Base):
     __tablename__ = "images"
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
