@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import datetime
 from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTableUUID, SQLAlchemyBaseOAuthAccountTableUUID
 from sqlalchemy import String, Integer, DateTime, Boolean, func
 from sqlalchemy.orm import DeclarativeBase, relationship, Mapped, mapped_column
@@ -33,21 +33,17 @@ class Permission(Base):
     can_add_tag: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     can_update_tag: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     can_delete_tag: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
-
     can_update_comment: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     can_delete_comment: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
 
 
-#####___________COMMENTS MODELS____START___#################
 class Comment(Base):
     __tablename__ = "comments"
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(Integer, nullable=False)
     picture_id: Mapped[int] = mapped_column(Integer, nullable=False)
     comment_text: Mapped[str] = mapped_column(String(150))
-    created_at: Mapped[date] = mapped_column('created_at', DateTime, default=func.now(), nullable=True)
-    updated_at: Mapped[date] = mapped_column('updated_at', DateTime, default=func.now(), onupdate=func.now(),
-                                             nullable=True)
-#####___________COMMENTS MODELS____END___#################
+    created_at: Mapped[datetime] = mapped_column('created_at', DateTime, default=func.now(), nullable=True)
+    updated_at: Mapped[datetime] = mapped_column('updated_at', DateTime, default=func.now(), onupdate=func.now(), nullable=True)
 
 

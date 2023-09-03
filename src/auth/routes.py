@@ -39,8 +39,6 @@ router.include_router(
 )
 
 
-@router.get("/auth/set_new_password/{token}", tags=["auth"]
-            # dependencies=[Depends(RateLimiter(times=1, hours=1))]
-            )
+@router.get("/auth/set_new_password/{token}", tags=["auth"])
 async def reset_password_form(request: Request):
     return templates.TemplateResponse("reset_password_form.html", {"request": request})

@@ -37,7 +37,6 @@ class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
 
         print(f"User {user.id} has forgot their password. Reset token: {token}")
 
-
     async def on_after_request_verify(
             self, user: User, token: str, request: Optional[Request] = None
     ):
@@ -60,5 +59,5 @@ auth_backend = AuthenticationBackend(
 
 fastapi_users = FastAPIUsers[User, uuid.UUID](get_user_manager, [auth_backend])
 
-#add cache
+# add cache
 current_active_user = fastapi_users.current_user(active=True)
