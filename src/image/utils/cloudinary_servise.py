@@ -4,9 +4,9 @@ from fastapi import UploadFile
 
 # Конфігурація Cloudinary
 cloudinary.config(
-    cloud_name="dcmdvhvu8",
-    api_key="644468815235554",
-    api_secret="5gywcDaG70Fsh6NLXWZE01rRSRo"
+    cloud_name="CLOUDINARY_CLOUD_NAME",
+    api_key="CLOUDINARY_API_KEY",
+    api_secret="CLOUDINARY_API_SECRET"
 )
 
 # Функція для завантаження зображення на Cloudinary
