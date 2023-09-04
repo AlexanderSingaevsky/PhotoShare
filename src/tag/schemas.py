@@ -1,19 +1,16 @@
 from pydantic import BaseModel
+from datetime import datetime
 
 
 class TagCreate(BaseModel):
-    title: str
-    description: str
+    name: str
 
 
 class TagUpdate(BaseModel):
-    description: str
+    name: str
 
 
-class Tag(BaseModel):
+class Tag(TagCreate):
     id: int
-    title: str
-    description: str
-
-    class Config:
-        orm_mode = True
+    created_at: datetime
+    updated_at: datetime | None

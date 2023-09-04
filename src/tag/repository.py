@@ -1,14 +1,15 @@
 # tag related queries here
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from src.database.sql.alchemy_models import Tag
-
+from src.database.sql.alchemy_models import Tag, Image, User
 
 class TagRepository:
-    async def create_tag(self, tag_data):
-        pass
+    def __init__(self, session: AsyncSession):
+        self.session = session
 
-    async def delete_tag(self, tag):
-        pass
+    async def create(self, tag: Tag):
+        self.session.add(tag)
+        await self.session.commit()
 
-    async def get_posts_by_tag(self, tag_name: str):
-        pass
+    async def read(self, tag_id: int):
+        return await self.session.query(Tag).filter(Tag.id == tag_id).first()
