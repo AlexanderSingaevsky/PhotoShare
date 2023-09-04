@@ -1,19 +1,23 @@
+import uuid
+
 from pydantic import BaseModel
+from datetime import datetime
 
-# Модель для створення нової фотографії
-class ImageCreate(BaseModel):
+
+class ImageSchemaRequest(BaseModel):
     title: str
-    description: str
 
-# Модель для оновлення опису фотографії
-class ImageUpdate(BaseModel):
-    description: str
 
-# Модель для фотографії
-class Image(BaseModel):
+class ImageSchemaUpdateRequest(ImageSchemaRequest):
+    pass
+
+
+class ImageSchemaResponse(ImageSchemaRequest):
     id: int
-    title: str
-    description: str
+    owner_id: uuid.UUID
+    cloudinary_url: str
+    created_at: datetime
+    updated_at: datetime | None
 
     class Config:
-        orm_mode = True
+        from_attributes: True
