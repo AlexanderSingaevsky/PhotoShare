@@ -4,18 +4,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database.sql.alchemy_models import Image, User
 from src.image.schemas import ImageSchemaRequest, ImageSchemaUpdateRequest
-from src.image.utils.cloudinary_servise import upload_image, valid_image_file
 
 
 class ImageQuery:
 
     @staticmethod
-    async def create(image_data: ImageSchemaRequest, user: User, session: AsyncSession, image_file: UploadFile) -> Image:
-        if not valid_image_file(image_file):
-            raise HTTPException(status_code=422, detail="Invalid image file")
-        # Завантажуємо зображення на Cloudinary
-        cloudinary_url = await upload_image(image_data.file)  # Передаємо файл зображення
-        image = Image(**image_data.model_dump(), owner_id=user.id, cloudinary_url=cloudinary_url)
+    async def create(title: str, cloudinary_url: str, user: User, session: AsyncSession) -> Image:
+        image = Image(title=title, owner_id=user.id, cloudinary_url=cloudinary_url)
         session.add(image)
         await session.commit()
         return image

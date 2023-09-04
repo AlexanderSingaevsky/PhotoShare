@@ -1,11 +1,10 @@
 import uuid
-
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from datetime import datetime
 
 
 class ImageSchemaRequest(BaseModel):
-    title: str
+    title: str = Field()
 
 
 class ImageSchemaUpdateRequest(ImageSchemaRequest):

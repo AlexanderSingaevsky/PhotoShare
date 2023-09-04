@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends, status, UploadFile
+from fastapi import APIRouter, HTTPException, Depends, status, UploadFile, File, Form
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from redis.asyncio.client import Redis
@@ -10,23 +10,22 @@ from src.database.cache.redis_conn import cache_database
 from src.image.repository import ImageQuery
 from src.image.schemas import ImageSchemaRequest, ImageSchemaResponse, ImageSchemaUpdateRequest
 from src.auth.utils.access import access_service
-from src.image.utils.cloudinary_servise import upload_image, valid_image_file
+from src.image.utils.cloudinary_servise import upload_image
 
 router = APIRouter(prefix='/image', tags=["images"])
 
 
 @router.post("/create", response_model=ImageSchemaResponse, status_code=status.HTTP_201_CREATED)
-async def create_image(image_data: ImageSchemaRequest,
-                       image_file: UploadFile,  # Зображення завантажується через UploadFile
+async def create_image(title: str = Form(),
+                       image_file: UploadFile = File(),
                        user: User = Depends(current_active_user),
                        db: AsyncSession = Depends(database),
                        cache: Redis = Depends(cache_database)):
     access_service('can_add_image', user)  # TODO
-    if not valid_image_file(image_file):
-        raise HTTPException(status_code=422, detail="Invalid image file")
-    # Завантажуємо зображення на Cloudinary
-    cloudinary_url = await upload_image(image_file)
-    image = await ImageQuery.create(image_data, user, db, image_file)
+    # if not valid_image_file(image_file):
+    #     raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Invalid image file")
+    cloudinary_url = await upload_image(image_file, user)
+    image = await ImageQuery.create(title, cloudinary_url, user, db)
     return image
 
 

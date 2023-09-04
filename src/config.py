@@ -25,6 +25,10 @@ class Settings(BaseSettings):
     mail_server: str = Field()
     mail_from_name: str = Field()
 
+    cloudinary_name: str = Field()
+    cloudinary_api_key: int = Field()
+    cloudinary_api_secret: str = Field()
+
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
