@@ -15,12 +15,14 @@ from src.image.routes import router as images
 from src.auth.routes import router as auth
 from src.comment.routes import router as comments
 from src.auth.utils.access import access_service
+from src.tag.routes import router as tags
 
 app = FastAPI()
 
 app.include_router(auth)
 app.include_router(images, prefix='/api')
 app.include_router(comments, prefix='/api')
+app.include_router(tags, prefix='/api')
 
 
 @app.get("/")

@@ -58,8 +58,7 @@ class Image(Base):
     cloudinary_url: Mapped[str] = mapped_column(String(300), nullable=False, default='placeholder')
     created_at: Mapped[datetime] = mapped_column(DateTime, default=func.now())
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=None, onupdate=func.now(), nullable=True)
-
-# задаємо классb тегів
+    tags: Mapped['Tag'] = relationship("Tag", secondary='image_tags', back_populates="images")
 
 
 class Tag(Base):
@@ -68,9 +67,14 @@ class Tag(Base):
     name: Mapped[str] = mapped_column(String(50), nullable=False, unique=True)
     images: Mapped[list[Image]] = relationship("Image", secondary='image_tags', back_populates="tags")
 
+    # def __repr__(self):
+    #     return self.name
+
+
 class ImageTag(Base):
     __tablename__ = 'image_tags'
-    image_id: Mapped[int] = mapped_column(Integer, ForeignKey('images.id'), primary_key=True)
-    tag_id: Mapped[int] = mapped_column(Integer, ForeignKey('tags.id'), primary_key=True)
-    image: Mapped[Image] = relationship("Image", back_populates="tags")
-    tag: Mapped[Tag] = relationship("Tag", back_populates="images")
+    id: Mapped[int] = mapped_column(primary_key=True)
+    image_id: Mapped[int] = mapped_column(Integer, ForeignKey('images.id'))
+    tag_id: Mapped[int] = mapped_column(Integer, ForeignKey('tags.id'))
+    # image: Mapped[Image] = relationship("Image", back_populates="tags")
+    # tag: Mapped[Tag] = relationship("Tag", back_populates="images")
