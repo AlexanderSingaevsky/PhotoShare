@@ -42,9 +42,9 @@ class Permission(Base):
 class Comment(Base):
     __tablename__ = "comments"
     id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int] = mapped_column(Integer, nullable=False)
+    owner_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey('user.id'))
     picture_id: Mapped[int] = mapped_column(Integer, nullable=False)
-    comment_text: Mapped[str] = mapped_column(String(150))
+    text: Mapped[str] = mapped_column(String(200))
     created_at: Mapped[datetime] = mapped_column('created_at', DateTime, default=func.now(), nullable=True)
     updated_at: Mapped[datetime] = mapped_column('updated_at', DateTime, default=func.now(), onupdate=func.now(), nullable=True)
 
