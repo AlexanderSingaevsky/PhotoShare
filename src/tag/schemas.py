@@ -4,6 +4,7 @@ from datetime import datetime
 
 class TagSchemaRequest(BaseModel):
     name: str
+    description: str
 
 
 class TagSchemaUpdateRequest(TagSchemaRequest):

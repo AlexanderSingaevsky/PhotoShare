@@ -72,7 +72,7 @@ class Tag(Base):
     __tablename__ = 'tags'
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(50), nullable=False, unique=True)
-    images: Mapped[list[Image]] = relationship("Image", secondary='image_tags', back_populates="tags")
+    images: Mapped[relationship] = relationship("Image", secondary='image_tags', back_populates="tags")
 
     # def __repr__(self):
     #     return self.name
