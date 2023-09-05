@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.database.sql.postgres_conn import database
 from src.tag.schemas import TagSchemaRequest, TagSchemaResponse, TagSchemaUpdateRequest
 from src.tag.repository import TagRepository
-from sqlalchemy.orm import relationship
+
 
 router = APIRouter(prefix='/tag', tags=["tags"])
 

@@ -1,6 +1,5 @@
 # tag related queries here
 from sqlalchemy import select, or_
-from sqlalchemy.orm import relationship
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.database.sql.alchemy_models import Tag
 from src.tag.schemas import TagSchemaRequest, TagSchemaResponse, TagSchemaUpdateRequest
