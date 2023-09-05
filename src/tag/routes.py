@@ -33,7 +33,7 @@ async def delete_tag(tag_id: int, session: AsyncSession = Depends(database)):
     await TagRepository.delete(tag_id, session)
     return None
 
-@router.get("/search/", response_model=relationship[TagSchemaResponse])
+@router.get("/search/", response_model=list[TagSchemaResponse])
 async def search_tags(query: str, session: AsyncSession = Depends(database.get_session)):
     tags = await TagRepository.search_tags(query, session)
     return tags
