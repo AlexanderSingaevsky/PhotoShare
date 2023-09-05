@@ -1,19 +1,19 @@
 from pydantic import BaseModel
+from datetime import datetime
 
 
-class TagCreate(BaseModel):
-    title: str
-    description: str
+class TagSchemaRequest(BaseModel):
+    name: str
 
 
-class TagUpdate(BaseModel):
-    description: str
+class TagSchemaUpdateRequest(TagSchemaRequest):
+    pass
 
 
-class Tag(BaseModel):
+class TagSchemaResponse(TagSchemaRequest):
     id: int
-    title: str
-    description: str
 
     class Config:
-        orm_mode = True
+        from_attributes: True
+
+
