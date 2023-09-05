@@ -1,7 +1,4 @@
-from typing import List
-
-from fastapi import APIRouter, Path, Depends, status, Query
-from fastapi.responses import JSONResponse
+from fastapi import APIRouter, Path, Depends, status, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.database.sql.alchemy_models import User
 from src.auth.service import current_active_user
@@ -22,8 +19,10 @@ async def create_comment(body: CommentSchemaRequest,
 
 
 @router.get('/{comment_id}', response_model=CommentSchemaResponse)
-async def get_one_comment(comment_id: int = Path(ge=1), user: User = Depends(current_active_user), db: AsyncSession = Depends(database)):
+async def get_comment(comment_id: int = Path(ge=1), user: User = Depends(current_active_user), db: AsyncSession = Depends(database)):
     comment = await CommentQuery.read(comment_id, db)
+    if not comment:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Comment not found!')
     return comment
 
 
@@ -33,6 +32,8 @@ async def update_comment(comment_id: int,
                          user: User = Depends(current_active_user),
                          db: AsyncSession = Depends(database)):
     comment = await CommentQuery.update(comment_id, body, db)
+    if not comment:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Comment not found!')
     return comment
 
 
