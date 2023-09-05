@@ -29,19 +29,12 @@ class TagRepository:
         stmt = select(Image).where(Image.id == tag_schema.image_id)
         result = await session.execute(stmt)
         image = result.scalars().unique().one_or_none()
-        if  image:
-            for tag in tag_schema.names:
-                stmt = select(Tag).where(Tag.name == tag)
-                tags = await session.execute(stmt)
-                tags = tags.scalars().unique().one_or_none()
-                if tags:
-                    stmt = select(ImageTag).join(Tag).join(Image).filter(Tag.name == tag, ImageTag.image_id == image.id)
-                    tag_to_delete = await session.execute(stmt)
-                    tag_to_delete = tag_to_delete.scalars().unique().one_or_none()
-                    if tag_to_delete:
-                        image.tags.remove(tag_to_delete)
+        if image:
+            for tag in image.tags:
+                if tag.name in tag_schema.names:
+                    image.tags.remove(tag)
+        session.add(image)
         await session.commit()
-
         return image
 
 
