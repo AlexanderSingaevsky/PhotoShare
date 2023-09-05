@@ -41,7 +41,7 @@ class TagRepository:
             await session.commit()
 
     @staticmethod
-    async def search_tags(query: str, session: AsyncSession) -> relationship[Tag]:
+    async def search_tags(query: str, session: AsyncSession) -> list[Tag]:
         stmt = select(Tag).filter(or_(Tag.name.ilike(f"%{query}%")))
         tags = await session.execute(stmt)
         return tags.scalars().all()
