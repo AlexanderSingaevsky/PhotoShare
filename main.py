@@ -42,6 +42,7 @@ async def healthchecker(db: AsyncSession = Depends(database), cache: Redis = Dep
 @app.get("/example/user-authenticated")
 async def authenticated_route(user: User = Depends(current_active_user)):
     is_allowed = await access_service('can_add_image', user, 1)
+    print(user.images)
     return {"email": user.email,
             'role': user.permission.role_name,
             'is_allowed': is_allowed,
