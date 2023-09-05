@@ -1,20 +1,15 @@
 from pydantic import BaseModel
-from datetime import datetime
-
+from typing import List
 
 class TagSchemaRequest(BaseModel):
-    name: str
-    description: str
-
+    image_id: int
+    names: List[str]
 
 class TagSchemaUpdateRequest(TagSchemaRequest):
     pass
-
 
 class TagSchemaResponse(TagSchemaRequest):
     id: int
 
     class Config:
-        from_attributes: True
-
-
+        orm_mode = True
