@@ -31,7 +31,7 @@ The project is available online at [https://Memento.onrender.com](https://mement
 
 ## Description
 
-Our program provides the user with the ability to upload, edit and delete images. There is a convenient system of tags that allows you to limit the search according to your interests. It is possible to comment on images and vote for their rating. In short, everything you need to keep memories and share them.
+Our program provides the user with the ability to upload, edit and delete images. There is a convenient tag system that allows you to narrow your search according to your interests. It is possible to comment on the image. There is also a rating system based on user ratings. In short, everything you need to save and share memories.
 
 ## Project Installation
 
