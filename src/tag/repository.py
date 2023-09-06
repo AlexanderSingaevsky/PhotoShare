@@ -13,10 +13,10 @@ class TagRepository:
         if image:
             for tag in tag_schema.names:
                 stmt = select(Tag).where(Tag.name == tag)
-                tag1 = await session.execute(stmt)
-                tag1 = tag1.scalars().unique().one_or_none()
-                if tag1:
-                    image.tags.append(tag1)
+                tag_to_append = await session.execute(stmt)
+                tag_to_append = tag_to_append.scalars().unique().one_or_none()
+                if tag_to_append:
+                    image.tags.append(tag_to_append)
                 else:
                     image.tags.append(Tag(name=tag))
             session.add(image)
@@ -26,14 +26,20 @@ class TagRepository:
 
     @staticmethod
     async def delete_tags(tag_schema: TagSchemaRequest, session: AsyncSession) -> Image:
+        # Перевірка наявності зображення
         stmt = select(Image).where(Image.id == tag_schema.image_id)
         result = await session.execute(stmt)
         image = result.scalars().unique().one_or_none()
         if image:
-            for tag in image.tags:
-                if tag.name in tag_schema.names:
-                    image.tags.remove(tag)
-        session.add(image)
+            # Перевірка наявності тегу
+            for tag in tag_schema.names:
+                stmt = select(Tag).where(Tag.name == tag)
+                tag_to_delete = await session.execute(stmt)
+                tag_to_delete = tag_to_delete.scalars().unique().one_or_none()
+            
+            if tag_to_delete:
+                # Видалення зв'язку між тегом та зображенням
+                image.tags.remove(tag)
         await session.commit()
         return image
 
