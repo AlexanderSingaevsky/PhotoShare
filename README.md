@@ -44,7 +44,7 @@ To manage project dependencies, `pipenv` is used.
 Detailed steps in your terminal a following:
 
 ```bash
-$ git clone https://github.com/sergiokapone/SnapshotExchange.git
+$ git clone https://github.com/NightSpring1/InstaLike_PhotoSharing
 $ cd InstaLike_PhotoSharing
 $ pipenv install
 $ python main.py
