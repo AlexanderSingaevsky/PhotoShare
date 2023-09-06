@@ -1,69 +1,89 @@
-# Технічне завдання на створення застосунку “PhotoShare” (REST API)
+# [SnapShot Exchange](https://snapshotexchange.onrender.com/) <span><img align="right" width="32px" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/fastapi/fastapi-original.svg"/><span> </span><img align="right" width="32px" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg"/></span>
 
-## Основний функціонал для REST API виконаний на FastAPI
+The project is available online at [https://Memento.onrender.com](https://snapshotexchange.onrender.com/)
 
-## Аутентифікація
+![Version](https://img.shields.io/badge/Version-1.0.0-blue.svg)
+![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-- Створюємо механізм аутентифікації. Використовуємо JWT токени
-- Користувачі мають три ролі. Звичайний користувач, модератор, та адмінстратор. Перший користувач в системі завжди адміністратор
-- Для реалізації різних рівнів доступу (звичайний користувач, модератор і адміністратор) ми можемо використовувати декоратори FastAPI для перевірки токена і ролі користувача.
+## Table of contents
 
-## Робота с світлинами
+- [Using Technologies](#using-technologies)
+- [Description](#description)
+- [Project Installation](#project-installation)
+- [Implementation](#implementation)
+  - [API routes](#api-routes)
+  - [Server side rendering](#server-side-rendering)
+  - [Chat](#chat)
+- [Information for Developers](#information-for-developers)
+- [License](#license)
+  - [MIT License](#mit-license)
 
-- Користувачі можуть завантажувати світлини з описом (POST).
-- Користувачі можуть видаляти світлини (DELETE).
-- Користувачі можуть редагувати опис світлини (PUT).
-- Користувачі можуть отримувати світлину за унікальним посиланням (GET).
-- Можливість додавати до 5 тегів під світлину. Додавання тегу не обов'язкове при завантаженні світлини.
-- Теги унікальні для всього застосунку. Тег передається на сервер по імені. Якщо такого тега не існує, то він створюється, якщо існує, то для світлини береться існуючий тег з такою назвою.
-- Користувачі можуть виконувати базові операції над світлинами, які дозволяє сервіс Cloudinary (https://cloudinary.com/documentation/image_transformations). Можливо вибрати обмежений набір трансформацій над світлинами для свого застосунку з Cloudinary.
-- Користувачі можуть створювати посилання на трансформоване зображення для перегляду світлини в вигляді URL та QR-code (https://pypi.org/project/qrcode/). Операція POST, оскільки створюється окреме посилання на трансформоване зображення, яке зберігається в базі даних
-- Створені посилання зберігаються на сервері і через мобільний телефон ми можемо відсканувати QR-code та побачити зображення
-- Адміністратори можуть робить всі CRUD операції зі світлинами користувачів
+## Using Technologies
 
+![Language](https://img.shields.io/badge/Language-Python-blue.svg)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.103.0-blue.svg)
+![Pydantic](https://img.shields.io/badge/Pydantic-2.3-blue.svg)
+![asyncio](https://img.shields.io/badge/asyncio-included-green.svg)
+![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-2.0.20-blue.svg)
+![Alembic](https://img.shields.io/badge/Alembic-1.7.3-blue.svg)
+![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL-blue.svg)
+![Redis](https://img.shields.io/badge/Database-Redis-red.svg)
 
-## Коментування
+## Description
 
-- Під кожною світлиною, є блок з коментарями. Користувачі можуть коментувати світлину один одного
-- Користувач може редагувати свій коментар, але не видаляти
-- Адміністратори та модератори можуть видаляти коментарі.
-- Для коментарів обов'язково зберігати час створення та час редагування коментаря в базі даних. Для реалізації функціональності коментарів, ми можемо використовувати відношення "один до багатьох" між світлинами і коментарями в базі даних. Для тимчасового маркування коментарів, використовувати стовпці "created_at" і "updated_at" у таблиці коментарів.
+Our program provides the user with the ability to upload, edit and delete images. There is a convenient system of tags that allows you to limit the search according to your interests. It is possible to comment on images and vote for their rating. In short, everything you need to keep memories and share them.
 
+## Project Installation
 
-## Додатковий функціонал
+To manage project dependencies, `pipenv` is used.
 
-- Створити маршрут для профіля користувача за його унікальним юзернеймом. Повинна повертатися вся інформація про користувача. Імя, коли зарєсттрований, кількість завантажених фото тощо
-- Користувач може редагувати інформацію про себе, та бачити інформацію про себе. Це мають бути різні маршрути з профілем користувача. Профіль для всіх користувачів, а інформація для себе - це те що можно редагувати
-- Адміністратор може робити користувачів неактивними (банити). Неактивні користувачі не можуть заходити в застосунок
+- Make sure you have `pipenv` installed
+- Clone the repository `git clone https://github.com/NightSpring1/InstaLike_PhotoSharing`
+- To install the dependencies, use the `pipenv install` or `pipenv sync` command.
 
+Detailed steps in your terminal a following:
 
-## Додатково по можливості реалізувати наступні задачі, якщо дозволяє час.
+```bash
+$ git clone https://github.com/sergiokapone/SnapshotExchange.git
+$ cd InstaLike_PhotoSharing
+$ pipenv install
+$ python main.py
+```
 
-- Реалізувати механізм виходу користувача з застосунку через logout. Access token повинен бути добавлений на час його існування в чорний список.
-## Рейтинг
+## Implementation
 
-- Користувачі можуть виставляти рейтинг світлині від 1 до 5 зірок. Рейтинг обчислюється як середнє значення оцінок всіх користувачів. 
-- Можна тільки раз виставляти оцінку світлині для користувача. 
-- Не можливо оцінювати свої світлини. 
-- Модератори та адміністратори можуть переглядати та видаляти оцінки користувачів.
+Once the application is running _locally_, you can browse to run it on your local host using the following links[^1]:
 
-## Пошук та фільтрація
+- To view detailed information on our project [http://localhost:8000/views/info](http://localhost:8000/views/info)
+- To view detailed information on our project in `JSON` format [http://localhost:8000/](http://localhost:8000)
+- To test the connection to the database and server time information [http://localhost:8000/api/healthchecker](http://localhost:8000/api/healthchecker)
 
-- Користувач може здійснювати пошук світлин за ключовим словом або тегом. Після пошуку користувач може відфільтрувати результати за рейтингом або датою додавання.
-- Модератори та адміністратори можуть виконувати пошук та фільтрацію за користувачами, які додали світлини.
-- Покрити застосунок модульними тестами, добитись покриття більш ніж на 90 %
-- Виконайте деплой застосунку для якогось хмарного сервісу на ваш вибір. Рекомендація Koyeb (https://app.koyeb.com/auth/signin) , Fly.io (https://fly.io/app/sign-in) 
+For comfortable viewing of `JSON` respone in your browser we recommend to install the extension for Google Chrome
+[JSON Viewer](https://chrome.google.com/webstore/detail/json-viewer/gbmdgpbipfallnflgajpaliibnhdgobh/related?hl=ru) or
+[JSON Formatter](https://chrome.google.com/webstore/detail/json-formatter/bcjindcccaagfpapjjmafapmmgkkhgoa?hl=ru) (according to your taste)
 
+### API routes
 
-## Критерії прийому
+The main task of the project was to implement a REST API, which plays a key role in ensuring effective interaction between interface developers (React, View, Angular) and our service.
 
-- Web-застосунок реалізований на фреймворку FastAPI.
-- Проєкт має бути збережений в окремому репозиторії та бути загальнодоступним (GitHub, GitLab або BitBucket).
-- Для зберігання інформації про користувачів, світлини та коментарі використовувати PostgreSQL. Для взаємодії з базою даних, використовувати бібліотеку SQLAlchemy, яка надає ORM-функціональність для роботи з базою даних.
-- Проєкт містить докладну інструкцію щодо встановлення та використання.
-- Проєкт повністю реалізує вимоги, описані в завданні.
-- Проєкт має повну Swagger документацію
+All documentation on interacting with our API is available at the following links:
 
+- To view swagger documentation [http://localhost:8000/docs](http://localhost:8000/docs)
+- To view redoc documentation [http://localhost:8000/redoc](http://localhost:8000/redoc)
 
+## Information for Developers
 
-P.S.: Ви можете розширити функціонал проєкту на свій розсуд, обов'язково проконсультувавшись з ментором перед цим. Розглядайте цей проєкт, як частину вашого портфоліо і корисний вам інструмент. З цієї причини ініціатива у розширенні та доповненні вимог до проєкту вітається. Наприклад ви можете додати файл Dockerfile, щоб програма могла бути розміщена в контейнері Docker та образ завантажений на dockerhub.
+Our project is equipped with Sphinx documentation, which you can find at [https://sergiokapone.github.io/SnapshotExchange/](https://sergiokapone.github.io/SnapshotExchange/). The documentation may be useful to other developers who
+can use it to develop our project.
+
+## License
+
+This project is licensed under the terms of the [MIT License](LICENSE).
+
+### MIT License
+
+Copyright © [FastTrack Codes]
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
