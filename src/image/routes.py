@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends, status
+from fastapi import APIRouter, HTTPException, Depends, status, UploadFile, File, Form
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from redis.asyncio.client import Redis
@@ -10,17 +10,22 @@ from src.database.cache.redis_conn import cache_database
 from src.image.repository import ImageQuery
 from src.image.schemas import ImageSchemaRequest, ImageSchemaResponse, ImageSchemaUpdateRequest
 from src.auth.utils.access import access_service
+from src.image.utils.cloudinary_service import UploadImage
 
 router = APIRouter(prefix='/image', tags=["images"])
 
 
 @router.post("/create", response_model=ImageSchemaResponse, status_code=status.HTTP_201_CREATED)
-async def create_image(image_data: ImageSchemaRequest,
+async def create_image(title: str = Form(),
+                       image_file: UploadFile = File(),
                        user: User = Depends(current_active_user),
                        db: AsyncSession = Depends(database),
                        cache: Redis = Depends(cache_database)):
-    access_service('can_add_image', user)  # TODO
-    image = await ImageQuery.create(image_data, user, db)
+    # access_service('can_add_image', user)  # TODO
+    public_id = UploadImage.generate_name_folder(user)
+    r = UploadImage.upload(image_file.file, public_id)
+    src_url = UploadImage.get_pic_url(public_id, r)
+    image = await ImageQuery.create(title, src_url, user, db)
     return image
 
 
@@ -29,7 +34,7 @@ async def get_image(image_id: int,
                     user: User = Depends(current_active_user),
                     db: AsyncSession = Depends(database),
                     cache: Redis = Depends(cache_database)):
-    access_service('can_add_image', user)  # TODO
+    # access_service('can_add_image', user)  # TODO
     image = await ImageQuery.read(image_id, db)
     if not image:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Image not found!')

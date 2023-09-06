@@ -1,3 +1,4 @@
+from fastapi import UploadFile, HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -8,8 +9,8 @@ from src.image.schemas import ImageSchemaRequest, ImageSchemaUpdateRequest
 class ImageQuery:
 
     @staticmethod
-    async def create(image_data: ImageSchemaRequest, user: User, session: AsyncSession) -> Image:
-        image = Image(**image_data.model_dump(), owner_id=user.id)
+    async def create(title: str, cloudinary_url: str, user: User, session: AsyncSession) -> Image:
+        image = Image(title=title, owner_id=user.id, cloudinary_url=cloudinary_url)
         session.add(image)
         await session.commit()
         return image
@@ -39,5 +40,3 @@ class ImageQuery:
         if image:
             await session.delete(image)
             await session.commit()
-
-
