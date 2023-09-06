@@ -73,7 +73,7 @@ All documentation on interacting with our API is available at the following link
 
 ## Information for Developers
 
-Our project is equipped with Sphinx documentation, which you can find at [https://sergiokapone.github.io/SnapshotExchange/](https://sergiokapone.github.io/SnapshotExchange/). The documentation may be useful to other developers who
+Our project is equipped with Sphinx documentation, which you can find at [https://github.com/NightSpring1/InstaLike_PhotoSharingExchange/](https://github.com/NightSpring1/InstaLike_PhotoSharingExchange/). The documentation may be useful to other developers who
 can use it to develop our project.
 
 ## License
