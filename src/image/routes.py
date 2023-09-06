@@ -10,7 +10,7 @@ from src.database.cache.redis_conn import cache_database
 from src.image.repository import ImageQuery
 from src.image.schemas import ImageSchemaRequest, ImageSchemaResponse, ImageSchemaUpdateRequest
 from src.auth.utils.access import access_service
-from src.image.utils.cloudinary_servise import upload_image
+from src.image.utils.cloudinary_service import UploadImage
 
 router = APIRouter(prefix='/image', tags=["images"])
 
@@ -21,11 +21,11 @@ async def create_image(title: str = Form(),
                        user: User = Depends(current_active_user),
                        db: AsyncSession = Depends(database),
                        cache: Redis = Depends(cache_database)):
-    access_service('can_add_image', user)  # TODO
-    # if not valid_image_file(image_file):
-    #     raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Invalid image file")
-    cloudinary_url = await upload_image(image_file, user)
-    image = await ImageQuery.create(title, cloudinary_url, user, db)
+    # access_service('can_add_image', user)  # TODO
+    public_id = UploadImage.generate_name_folder(user)
+    r = UploadImage.upload(image_file.file, public_id)
+    src_url = UploadImage.get_pic_url(public_id, r)
+    image = await ImageQuery.create(title, src_url, user, db)
     return image
 
 
@@ -34,7 +34,7 @@ async def get_image(image_id: int,
                     user: User = Depends(current_active_user),
                     db: AsyncSession = Depends(database),
                     cache: Redis = Depends(cache_database)):
-    access_service('can_add_image', user)  # TODO
+    # access_service('can_add_image', user)  # TODO
     image = await ImageQuery.read(image_id, db)
     if not image:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Image not found!')

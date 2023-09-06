@@ -40,5 +40,3 @@ class ImageQuery:
         if image:
             await session.delete(image)
             await session.commit()
-
-
