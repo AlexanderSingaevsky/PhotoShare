@@ -4,12 +4,18 @@ from typing import Optional
 
 from fastapi import Depends, Request
 from fastapi_users import BaseUserManager, FastAPIUsers, UUIDIDMixin
-from fastapi_users.authentication import AuthenticationBackend, BearerTransport, JWTStrategy
+from fastapi_users.authentication import (
+    AuthenticationBackend,
+    BearerTransport,
+    JWTStrategy,
+)
 
 from fastapi_users.db import SQLAlchemyUserDatabase
 from httpx_oauth.clients.google import GoogleOAuth2
+from starlette.responses import JSONResponse
 
-from src.auth.utils.email import send_email_for_reset_pswd
+from src.auth.utils.email import send_email_for_reset_pswd, send_email_verification
+from src.auth.utils.send_post import send_post_request
 from src.config import settings
 from src.database.sql.postgres_conn import User, get_user_db
 
@@ -29,17 +35,26 @@ class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
 
     async def on_after_register(self, user: User, request: Optional[Request] = None):
         print(f"User {user.id} has registered.")
+        result = await send_post_request(
+            request, str(user.email), "auth/request-verify-token"
+        )
+        return JSONResponse(result)
 
     async def on_after_forgot_password(
-            self, user: User, token: str, request: Optional[Request] = None
+        self, user: User, token: str, request: Optional[Request] = None
     ):
-        await send_email_for_reset_pswd(user.email, user.username, token, request.base_url)
+        await send_email_for_reset_pswd(
+            user.email, user.username, token, request.base_url
+        )
 
         print(f"User {user.id} has forgot their password. Reset token: {token}")
 
     async def on_after_request_verify(
-            self, user: User, token: str, request: Optional[Request] = None
+        self, user: User, token: str, request: Optional[Request] = None
     ):
+        await send_email_verification(
+            user.email, user.username, token, request.base_url
+        )
         print(f"Verification requested for user {user.id}. Verification token: {token}")
 
 

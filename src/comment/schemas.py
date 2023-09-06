@@ -1,42 +1,33 @@
+import uuid
 from typing import Optional
 
-from pydantic import BaseModel, EmailStr, Field, field_validator
-from datetime import date, datetime
+from pydantic import BaseModel
+from datetime import datetime
 
 
-class CommentSchema(BaseModel):
-    user_id: int = Field(1, ge=1)
-    picture_id: int = Field(1, ge=1)
-    comment_text: str = Field('Text of your comment', min_length=8, max_length=150)
+class CommentSchemaRequest(BaseModel):
+    image_id: int
+    text: str
 
 
-class CommentResponseSchema(BaseModel):
-    id: int = 1
-    user_id: int = 1
-    picture_id: int = 1
-    comment_text: str
+class CommentUpdateSchemaRequest(BaseModel):
+    text: str
+
+
+class CommentSchemaResponse(CommentSchemaRequest):
+    id: int
+    owner_id: uuid.UUID
+    image_id: int
+    text: str
     created_at: datetime
-    updated_at: datetime
+    updated_at: datetime | None
 
     class Config:
         from_attributes: True
 
 
-class CommentUpdateSchema(BaseModel):
-    id: int = 1
-    comment_text: str
-
-    class Config:
-        from_attributes: True
 
 
-class CommentUpdateResponseSchema(BaseModel):
-    id: int = 1
-    comment_text: str
-    updated_at: datetime
-    detail: str = 'Comment updated'
 
-    class Config:
-        from_attributes: True
 
 

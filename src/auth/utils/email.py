@@ -39,3 +39,18 @@ async def send_email_for_reset_pswd(email: EmailStr, username: str, reset_token:
 
     except ConnectionErrors as e:
         print(e)
+
+
+async def send_email_verification(email: EmailStr, username: str, verify_token: str, host: str):
+    try:
+        message = MessageSchema(
+            subject="Confirm your email ",
+            recipients=[email],
+            template_body={"host": host, "username": username, "token": verify_token},
+            subtype=MessageType.html
+        )
+
+        fm = FastMail(conf)
+        await fm.send_message(message, template_name="email_verification.html")
+    except ConnectionErrors as e:
+        print(e)
