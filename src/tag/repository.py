@@ -24,27 +24,27 @@ class TagRepository:
             await session.refresh(image)
         return image
 
-    @staticmethod
-    async def delete_tags(tag_schema: TagSchemaRequest, session: AsyncSession) -> Image:
-        # Перевірка наявності зображення
-        stmt = select(Image).where(Image.id == tag_schema.image_id)
-        result = await session.execute(stmt)
-        image = result.scalars().unique().one_or_none()
-        if image:
-            # Перевірка наявності тегу
-            for tag in tag_schema.names:
-                stmt = select(Tag).where(Tag.name == tag)
-                tag_to_delete = await session.execute(stmt)
-                tag_to_delete = tag_to_delete.scalars().unique().one_or_none()
-                if tag_to_delete:
-                    # Видалення зв'язку між тегом та зображенням
-                    image.tags.remove(tag)
-        await session.commit()
-        return image
+    # @staticmethod
+    # async def delete_tags(tag_schema: TagSchemaRequest, session: AsyncSession) -> Image:
+    #     # Перевірка наявності зображення
+    #     stmt = select(Image).where(Image.id == tag_schema.image_id)
+    #     result = await session.execute(stmt)
+    #     image = result.scalars().unique().one_or_none()
+    #     if image:
+    #         # Перевірка наявності тегу
+    #         for tag in tag_schema.names:
+    #             stmt = select(Tag).where(Tag.name == tag)
+    #             tag_to_delete = await session.execute(stmt)
+    #             tag_to_delete = tag_to_delete.scalars().unique().one_or_none()
+    #             if tag_to_delete:
+    #                 # Видалення зв'язку між тегом та зображенням
+    #                 image.tags.remove(tag)
+    #     await session.commit()
+    #     return image
 
 
     @staticmethod
-    async def delete_tags2(tag_schema: TagSchemaRequest, session: AsyncSession) -> Image:
+    async def delete(tag_schema: TagSchemaRequest, session: AsyncSession) -> Image:
         stmt = select(Image).where(Image.id == tag_schema.image_id)
         result = await session.execute(stmt)
         image = result.scalars().unique().one_or_none()
@@ -52,6 +52,6 @@ class TagRepository:
             for tag in image.tags:
                 if tag.name in tag_schema.names:
                     image.tags.remove(tag)
-        session.add(image)
-        await session.commit()
+            session.add(image)
+            await session.commit()
         return image
