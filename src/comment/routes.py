@@ -15,6 +15,8 @@ async def create_comment(body: CommentSchemaRequest,
                          user: User = Depends(current_active_user),
                          db: AsyncSession = Depends(database)):
     comment = await CommentQuery.create(body, user,  db)
+    if not comment:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Image does not exist!')
     return comment
 
 
