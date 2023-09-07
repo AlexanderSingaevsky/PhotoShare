@@ -47,8 +47,6 @@ async def authenticated_route(user: User = Depends(current_active_user)):
             'images': user.images}
 
 
-
-
 if __name__ == '__main__':
     uvicorn.run(app, host="localhost", port=8080)
     #  uvicorn main:app --host localhost --port 8000
