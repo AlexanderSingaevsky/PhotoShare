@@ -15,14 +15,16 @@ from src.image.routes import router as images
 from src.auth.routes import router as auth
 from src.comment.routes import router as comments
 from src.auth.utils.access import access_service
+from src.image.utils.generate_transform_routes import transformation_router
 from src.tag.routes import router as tags
 
 app = FastAPI()
 
 app.include_router(auth)
-app.include_router(images, prefix='/api')
-app.include_router(comments, prefix='/api')
-app.include_router(tags, prefix='/api')
+app.include_router(images, prefix="/api")
+app.include_router(comments, prefix="/api")
+app.include_router(tags, prefix="/api")
+app.include_router(transformation_router, prefix="/api")
 
 
 @app.get("/")
@@ -31,10 +33,12 @@ def read_root():
 
 
 @app.get("/example/healthchecker")
-async def healthchecker(db: AsyncSession = Depends(database), cache: Redis = Depends(cache_database)):
-    print('postgres connection check...')
+async def healthchecker(
+    db: AsyncSession = Depends(database), cache: Redis = Depends(cache_database)
+):
+    print("postgres connection check...")
     await db.execute(text("SELECT 1"))
-    print('redis connection check...')
+    print("redis connection check...")
     await cache.set("1", 1)
     return {"message": "Databases are OK!"}
 
@@ -43,10 +47,9 @@ async def healthchecker(db: AsyncSession = Depends(database), cache: Redis = Dep
 async def authenticated_route(user: User = Depends(current_active_user)):
     # is_allowed = await access_service('can_add_image', user, 1)
     print(user.images)
-    return {"email": user.email,
-            'images': user.images}
+    return {"email": user.email, "images": user.images}
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     uvicorn.run(app, host="localhost", port=8080)
     #  uvicorn main:app --host localhost --port 8000

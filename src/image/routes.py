@@ -1,3 +1,5 @@
+from typing import Union, Type
+
 from fastapi import APIRouter, HTTPException, Depends, status, UploadFile, File, Form
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -12,10 +14,14 @@ from src.image.schemas import (
     ImageSchemaRequest,
     ImageSchemaResponse,
     ImageSchemaUpdateRequest,
-    ImageSchemaOnEditRequest,
+    ImageAIReplaceTransformation,
+    ImageScaleTransformation,
+    ImageBlackAndWhiteTransformation,
+    ImageRotationTransformation,
+    ImageFlipModeTransformation,
 )
 from src.auth.utils.access import access_service
-from src.image.utils.cloudinary_service import UploadImage
+from src.image.utils.cloudinary_service import UploadImage, ImageEditor
 
 router = APIRouter(prefix="/image", tags=["images"])
 
@@ -54,24 +60,24 @@ async def get_image(
     return image
 
 
-@router.post("/edit/{image_id}", response_model=ImageSchemaResponse)
-async def edit_image(
-    image_id: int,
-    edit_data: ImageSchemaOnEditRequest,
-    user: User = Depends(current_active_user),
-    db: AsyncSession = Depends(database),
-    cache: Redis = Depends(cache_database),
-    # image_data: ImageSchemaUpdateRequest = None,
-):
-    image = await get_image(image_id, user, db, cache)
-    original_img_url = image.cloudinary_url
-    edited_img_url = UploadImage.edit_image(original_img_url, edit_data)
-    image = await ImageQuery.add_edited_url(image_id, db, edited_img_url)
-    if not image:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Image not found!"
-        )
-    return image
+# @router.post("/edit/{image_id}", response_model=ImageSchemaResponse)
+# async def edit_image(
+#     image_id: int,
+#     edit_data: ImageSchemaOnEditRequest,
+#     user: User = Depends(current_active_user),
+#     db: AsyncSession = Depends(database),
+#     cache: Redis = Depends(cache_database),
+#     # image_data: ImageSchemaUpdateRequest = None,
+# ):
+#     image = await get_image(image_id, user, db, cache)
+#     original_img_url = image.cloudinary_url
+#     edited_img_url = UploadImage.edit_image(original_img_url, edit_data)
+#     image = await ImageQuery.add_edited_url(image_id, db, edited_img_url)
+#     if not image:
+#         raise HTTPException(
+#             status_code=status.HTTP_404_NOT_FOUND, detail="Image not found!"
+#         )
+#     return image
 
 
 @router.get("/search/{image_search_string}")
@@ -110,3 +116,101 @@ async def delete_image(
 ):
     access_service("can_add_image", user)  # TODO
     await ImageQuery.delete(image_id, db)
+
+
+#
+# transformation_router = APIRouter(prefix="/image_transform", tags=["images"])
+#
+#
+# @transformation_router.get(
+#     "/get_transformation_form/{transformation_type}",
+#     response_model=Union[
+#         ImageScaleTransformation,
+#         ImageAIReplaceTransformation,
+#         ImageBlackAndWhiteTransformation,
+#         ImageRotationTransformation,
+#         ImageFlipModeTransformation,
+#     ],
+# )
+# async def get_transformation_form(transformation_type: str):
+#     """
+#     Приймає тип трансформації і відображає форму для редагування
+#     Можливі типи трансформацій:
+#     ai_replace, scale, black_and_white, rotation, flip_mode
+#     """
+#     transformation_types = {
+#         "scale": ImageScaleTransformation,
+#         "ai_replace": ImageAIReplaceTransformation,
+#         "black_and_white": ImageBlackAndWhiteTransformation,
+#         "rotation": ImageRotationTransformation,
+#         "flip_mode": ImageFlipModeTransformation,
+#     }
+#     if transformation_type not in transformation_types.keys():
+#         raise HTTPException(
+#             status_code=status.HTTP_404_NOT_FOUND,
+#             detail="Transformation type does not exist!",
+#         )
+#     print(transformation_types.get(transformation_type).__name__)
+#
+#     return transformation_types.get(transformation_type)
+#
+#
+# def create_transformation_route(
+#     transformation_type: str,
+#     transformation: Type[
+#         Union[
+#             ImageAIReplaceTransformation,
+#             ImageScaleTransformation,
+#             ImageBlackAndWhiteTransformation,
+#             ImageRotationTransformation,
+#             ImageFlipModeTransformation,
+#         ]
+#     ],
+# ):
+#     async def route(
+#         image_id: int,
+#         transformation_data: transformation,
+#         user: User = Depends(current_active_user),
+#         db: AsyncSession = Depends(database),
+#         cache: Redis = Depends(cache_database),
+#     ):
+#         image = await get_image(image_id, user, db, cache)
+#         original_img_url = image.cloudinary_url
+#         edited_img_url = await ImageEditor().edit_image(
+#             original_img_url, transformation_data
+#         )
+#         return edited_img_url
+#
+#     route.__name__ = transformation_type
+#     return route
+#
+#
+# transformation_router.add_api_route(
+#     "/ai_replace/{image_id}",
+#     create_transformation_route("ai_replace", ImageAIReplaceTransformation),
+#     methods=["POST"],
+# )
+#
+# transformation_router.add_api_route(
+#     "/scale/{image_id}",
+#     create_transformation_route("scale", ImageScaleTransformation),
+#     methods=["POST"],
+# )
+#
+# transformation_router.add_api_route(
+#     "/black_and_white/{image_id}",
+#     create_transformation_route("black_and_white", ImageBlackAndWhiteTransformation),
+#     methods=["POST"],
+# )
+#
+# transformation_router.add_api_route(
+#     "/rotation/{image_id}",
+#     create_transformation_route("rotation", ImageRotationTransformation),
+#     methods=["POST"],
+# )
+#
+# transformation_router.add_api_route(
+#     "/flip_mode/{image_id}",
+#     create_transformation_route("flip_mode", ImageFlipModeTransformation),
+#     methods=["POST"],
+# )
