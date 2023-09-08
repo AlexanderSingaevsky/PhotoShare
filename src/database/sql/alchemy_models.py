@@ -93,7 +93,7 @@ class Image(Base):
         String(300), nullable=False, default="placeholder"
     )
     edited_cloudinary_url: Mapped[str] = mapped_column(
-        String(300), nullable=True, default=None
+        String(300), nullable=False, default="placeholder"
     )
     created_at: Mapped[datetime] = mapped_column(DateTime, default=func.now())
     updated_at: Mapped[datetime] = mapped_column(

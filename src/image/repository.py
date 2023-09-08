@@ -1,9 +1,8 @@
-from fastapi import UploadFile, HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database.sql.alchemy_models import Image, User
-from src.image.schemas import ImageSchemaRequest, ImageSchemaUpdateRequest
+from src.image.schemas import ImageSchemaUpdateRequest
 
 
 class ImageQuery:
@@ -25,15 +24,16 @@ class ImageQuery:
     @staticmethod
     async def update(
         image_id: int,
-        image_data: ImageSchemaUpdateRequest,
         session: AsyncSession,
         edited_cloudinary_url: str = None,
+        image_data: ImageSchemaUpdateRequest = None,
     ) -> Image:
         stmt = select(Image).where(Image.id == image_id)
         image = await session.execute(stmt)
         image = image.scalars().unique().one_or_none()
         if image:
-            image.title = image_data.title
+            if image_data:
+                image.title = image_data.title
             if edited_cloudinary_url:
                 image.edited_cloudinary_url = edited_cloudinary_url
             await session.commit()
@@ -48,16 +48,3 @@ class ImageQuery:
         if image:
             await session.delete(image)
             await session.commit()
-
-    @staticmethod
-    async def add_edited_url(
-        image_id: int, session: AsyncSession, edited_cloudinary_url: str
-    ) -> Image:
-        stmt = select(Image).where(Image.id == image_id)
-        image = await session.execute(stmt)
-        image = image.scalars().unique().one_or_none()
-        if image:
-            image.edited_cloudinary_url = edited_cloudinary_url
-            await session.commit()
-            await session.refresh(image)
-        return image

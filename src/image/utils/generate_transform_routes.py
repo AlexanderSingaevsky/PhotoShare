@@ -8,6 +8,7 @@ from src.auth.service import current_active_user
 from src.database.cache.redis_conn import cache_database
 from src.database.sql.alchemy_models import User
 from src.database.sql.postgres_conn import database
+from src.image.repository import ImageQuery
 from src.image.routes import get_image
 from src.image.schemas import (
     ImageScaleTransformation,
@@ -15,8 +16,9 @@ from src.image.schemas import (
     ImageBlackAndWhiteTransformation,
     ImageRotationTransformation,
     ImageFlipModeTransformation,
+    ImageSchemaResponse,
 )
-from src.image.utils.cloudinary_service import ImageEditor
+from src.image.utils.cloudinary_service import ImageEditor, UploadImage
 
 transformation_router = APIRouter(prefix="/image_transform", tags=["images"])
 
@@ -52,8 +54,6 @@ async def get_transformation_form(
     print(response)
     return response
 
-    # return transformation_types.
-
 
 def create_transformation_route(
     transformation_type: str,
@@ -79,7 +79,11 @@ def create_transformation_route(
         edited_img_url = await ImageEditor().edit_image(
             original_img_url, transformation_data
         )
-        return edited_img_url
+        public_id = UploadImage.generate_name_folder(user, edited=True)
+        r = UploadImage.upload(edited_img_url, public_id)
+        edited_src_url = UploadImage.get_pic_url(public_id, r)
+        image = await ImageQuery.update(image_id, db, edited_src_url)
+        return image
 
     route.__name__ = transformation_type
     return route
@@ -89,30 +93,35 @@ transformation_router.add_api_route(
     "/ai_replace/{image_id}",
     create_transformation_route("ai_replace", ImageAIReplaceTransformation),
     methods=["POST"],
+    response_model=ImageSchemaResponse,
 )
 
 transformation_router.add_api_route(
     "/scale/{image_id}",
     create_transformation_route("scale", ImageScaleTransformation),
     methods=["POST"],
+    response_model=ImageSchemaResponse,
 )
 
 transformation_router.add_api_route(
     "/black_and_white/{image_id}",
     create_transformation_route("black_and_white", ImageBlackAndWhiteTransformation),
     methods=["POST"],
+    response_model=ImageSchemaResponse,
 )
 
 transformation_router.add_api_route(
     "/rotation/{image_id}",
     create_transformation_route("rotation", ImageRotationTransformation),
     methods=["POST"],
+    response_model=ImageSchemaResponse,
 )
 
 transformation_router.add_api_route(
     "/flip_mode/{image_id}",
     create_transformation_route("flip_mode", ImageFlipModeTransformation),
     methods=["POST"],
+    response_model=ImageSchemaResponse,
     description="""
         Flip mode. Possible values:
         vflip: Vertically mirror flips the image.
