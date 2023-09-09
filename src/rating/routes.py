@@ -11,8 +11,8 @@ from src.rating.schemas import RatingSchemaResponse, RatingSchemaRequest, Rating
 router = APIRouter(prefix="/rating", tags=["ratings"])
 
 
-@router.get('/{rating_id}', response_model=RatingSchemaResponse)
-async def get_comment(rating_id: int = Path(ge=1), user: User = Depends(current_active_user),
+@router.get('/{rating_id}', response_model=RatingSchemaResponse, name="Get one rating")
+async def get_rating(rating_id: int = Path(ge=1), user: User = Depends(current_active_user),
                       db: AsyncSession = Depends(database)):
     rating = await RatingQuery.read(rating_id, db)
     if not rating:
@@ -33,7 +33,7 @@ async def create_rating(body: RatingSchemaRequest,
     return rating
 
 
-@router.put('/update/{rating_id}', response_model=RatingSchemaResponse)
+@router.put('/update/{rating_id}', response_model=RatingSchemaResponse, name='Update rating')
 async def update_rating(rating_id: int,
                         body: RatingUpdateSchemaRequest,
                         user: User = Depends(current_active_user),
@@ -44,7 +44,7 @@ async def update_rating(rating_id: int,
     return await RatingQuery.update(rating_id, body, user, db)
 
 
-@router.delete('/delete/{rating_id}', status_code=status.HTTP_204_NO_CONTENT)
+@router.delete('/delete/{rating_id}', status_code=status.HTTP_204_NO_CONTENT, name='Delete rating')
 async def delete_rating(rating_id: int,
                         user: User = Depends(current_active_user),
                         db: AsyncSession = Depends(database)):
