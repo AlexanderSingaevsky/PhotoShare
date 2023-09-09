@@ -12,6 +12,7 @@ class CommentQuery:
         stmt = select(Image).where(Image.id == body.image_id)
         image = await db.execute(stmt)
         image = image.scalars().unique().one_or_none()
+        
         if not image:
             return None
         comment = Comment(**body.model_dump(), owner_id=user.id)
