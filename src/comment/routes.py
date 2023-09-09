@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.database.sql.alchemy_models import User
 from src.auth.service import current_active_user
 from src.comment.repository import CommentQuery
+from src.image.repository import ImageQuery
 from src.comment.schemas import CommentSchemaRequest, CommentSchemaResponse, CommentUpdateSchemaRequest
 from src.auth.utils.access import access_service
 from src.database.sql.postgres_conn import database
@@ -14,12 +15,13 @@ router = APIRouter(prefix="/comment", tags=["comments"])
 async def create_comment(body: CommentSchemaRequest,
                          user: User = Depends(current_active_user),
                          db: AsyncSession = Depends(database)):
+    image = ImageQuery.read(body.image_id, db)
+    if not image:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Image does not exist!')
     access = access_service('can_add_comment', user)
     if not access.is_authorized:
         raise HTTPException(status_code=access.status_code, detail=access.detail)
     comment = await CommentQuery.create(body, user,  db)
-    if not comment:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Image does not exist!')
     return comment
 
 
