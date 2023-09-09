@@ -1,14 +1,12 @@
 from pydantic import BaseModel
-from datetime import datetime
-
+from typing import List
 
 class TagSchemaRequest(BaseModel):
-    name: str
-
+    image_id: int
+    names: List[str]
 
 class TagSchemaUpdateRequest(TagSchemaRequest):
     pass
-
 
 class TagSchemaResponse(TagSchemaRequest):
     id: int

@@ -12,7 +12,6 @@ class CommentQuery:
         stmt = select(Image).where(Image.id == body.image_id)
         image = await db.execute(stmt)
         image = image.scalars().unique().one_or_none()
-        
         if not image:
             return None
         comment = Comment(**body.model_dump(), owner_id=user.id)
@@ -29,22 +28,14 @@ class CommentQuery:
         return comment
 
     @staticmethod
-    async def update(comment_id, body, db) -> Comment | None:
-        sq = select(Comment).filter_by(id=comment_id)
-        result = await db.execute(sq)
-        comment = result.scalar_one_or_none()
-        if comment:
-            comment.text = body.text
-            await db.commit()
-            await db.refresh(comment)
+    async def update(comment, body, db) -> Comment | None:
+        comment.text = body.text
+        await db.commit()
+        await db.refresh(comment)
         return comment
 
     @staticmethod
-    async def delete(comment_id: int, db: AsyncSession) -> None:
-        sq = select(Comment).filter_by(id=comment_id)
-        result = await db.execute(sq)
-        comment = result.scalar_one_or_none()
-        if comment:
-            await db.delete(comment)
-            await db.commit()
+    async def delete(comment: Comment, db: AsyncSession) -> None:
+        await db.delete(comment)
+        await db.commit()
 

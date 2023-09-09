@@ -1,38 +1,34 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.database.sql.postgres_conn import database
-from src.tag.schemas import TagSchemaRequest, TagSchemaResponse, TagSchemaUpdateRequest
+from src.database.sql.alchemy_models import User
+from src.auth.service import current_active_user
+from src.tag.schemas import TagSchemaRequest
 from src.tag.repository import TagRepository
+from src.image.repository import ImageQuery
+from src.auth.utils.access import access_service
 
 router = APIRouter(prefix='/tag', tags=["tags"])
 
 
-@router.post("/create", response_model=TagSchemaResponse)
-async def create_tag(tag_data: TagSchemaRequest, session: AsyncSession = Depends(database)):
-    tag = await TagRepository.create(tag_data, session)
-    return tag
+@router.post("/create", status_code=status.HTTP_201_CREATED)
+async def create_tag(tag_data: TagSchemaRequest, user: User = Depends(current_active_user), session: AsyncSession = Depends(database)):
+    image = await ImageQuery.read(tag_data.image_id, session)
+    if not image:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Image does not exist!')
+    access = access_service('can_add_tag', user, image)
+    if not access.is_authorized:
+        raise HTTPException(status_code=access.status_code, detail=access.detail)
+    await TagRepository.create(image, tag_data, session)
+    return {'detail': 'tags added'}
 
 
-@router.get("/{tag_id}", response_model=TagSchemaResponse)
-async def read_tag(tag_id: int, session: AsyncSession = Depends(database)):
-    tag = await TagRepository.read(tag_id, session)
-    if tag is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tag not found.")
-    return tag
-
-
-# @router.put("/{tag_id}", response_model=TagSchemaResponse)
-# async def update_tag(tag_id: int, tag_data: TagUpdate, session: AsyncSession = Depends(database.get_session)):
-#     async with session.begin():
-#         tag = await TagRepository.update(tag_id, tag_data.dict(), session)
-#         if tag is None:
-#             raise HTTPException(status_code=404, detail="Tag not found")
-#         return tag
-#
-#
-# @router.delete("/{tag_id}", response_model=None)
-# async def delete_tag(tag_id: int, session: AsyncSession = Depends(database.get_session)):
-#     async with session.begin():
-#         tag = await TagRepository.delete(tag_id, session)
-#         if tag is None:
-#             raise HTTPException(status_code=404, detail="Tag not found")
+@router.delete("/delete", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_tags(tag_data: TagSchemaRequest, user: User = Depends(current_active_user), session: AsyncSession = Depends(database)):
+    image = await ImageQuery.read(tag_data.image_id, session)
+    if not image:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Image does not exist!')
+    access = access_service('can_delete_tag', user, image)
+    if not access.is_authorized:
+        raise HTTPException(status_code=access.status_code, detail=access.detail)
+    await TagRepository.delete(image, tag_data, session)

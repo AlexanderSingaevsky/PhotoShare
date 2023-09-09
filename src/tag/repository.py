@@ -1,21 +1,30 @@
 # tag related queries here
-from sqlalchemy import select
+from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from src.database.sql.alchemy_models import Tag
-from src.tag.schemas import TagSchemaRequest, TagSchemaResponse, TagSchemaUpdateRequest
+from src.database.sql.alchemy_models import Tag, Image, ImageTag
+from src.tag.schemas import TagSchemaRequest
 
 class TagRepository:
     @staticmethod
-    async def create(tag_schema: TagSchemaRequest, session: AsyncSession) -> Tag:
-        tag = Tag(**tag_schema.model_dump())
-        session.add(tag)
+    async def create(image: Image, tag_schema: TagSchemaRequest, session: AsyncSession) -> Image:
+        for tag in tag_schema.names:
+            stmt = select(Tag).where(Tag.name == tag)
+            tag_to_append = await session.execute(stmt)
+            tag_to_append = tag_to_append.scalars().unique().one_or_none()
+            if tag_to_append:
+                image.tags.append(tag_to_append)
+            else:
+                image.tags.append(Tag(name=tag))
+        session.add(image)
         await session.commit()
-        await session.refresh(tag)
-        return tag
+        await session.refresh(image)
+        return image
 
     @staticmethod
-    async def read(tag_id: int, session: AsyncSession):
-        stmt = select(Tag).where(Tag.id == tag_id)
-        tag = await session.execute(stmt)
-        return tag.scalars().unique().one_or_none()
-
+    async def delete(image: Image, tag_schema: TagSchemaRequest, session: AsyncSession) -> Image:
+        for tag in image.tags:
+            if tag.name in tag_schema.names:
+                image.tags.remove(tag)
+        session.add(image)
+        await session.commit()
+        return image
