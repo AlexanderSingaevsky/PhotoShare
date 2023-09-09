@@ -41,7 +41,7 @@ class RatingQuery:
         rating = await db.scalar(
             select(Rating).where((Rating.owner_id == user.id) & (Rating.id == rating_id)))
         if not rating:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='This is not your rating!')
+            return None
         rating.value = body.value
         await db.commit()
         await db.refresh(rating)
@@ -54,7 +54,7 @@ class RatingQuery:
         rating = await db.scalar(
             select(Rating).where((Rating.owner_id == user.id) & (Rating.id == rating_id)))
         if not rating:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='This is not your rating!')
+            return None
         await db.delete(rating)
         await db.commit()
         return rating

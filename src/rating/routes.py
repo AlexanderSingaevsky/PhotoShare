@@ -41,7 +41,10 @@ async def update_rating(rating_id: int,
     rating = await RatingQuery.read(rating_id, db)
     if not rating:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Rating not found!')
-    return await RatingQuery.update(rating_id, body, user, db)
+    changed_rating = await RatingQuery.update(rating_id, body, user, db)
+    if not changed_rating:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='This is not your rating!')
+    return changed_rating
 
 
 @router.delete('/delete/{rating_id}', status_code=status.HTTP_204_NO_CONTENT, name='Delete rating')
@@ -51,4 +54,7 @@ async def delete_rating(rating_id: int,
     rating = await RatingQuery.read(rating_id, db)
     if not rating:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Rating not found!')
-    await RatingQuery.delete(rating_id, user, db)
+    deleted_rating = await RatingQuery.delete(rating_id, user, db)
+    if not deleted_rating:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='This is not your rating!')
+
