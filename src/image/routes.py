@@ -21,11 +21,13 @@ async def create_image(title: str = Form(),
                        user: User = Depends(current_active_user),
                        db: AsyncSession = Depends(database),
                        cache: Redis = Depends(cache_database)):
-    # access_service('can_add_image', user)  # TODO
-    public_id = UploadImage.generate_name_folder(user)
-    r = UploadImage.upload(image_file.file, public_id)
-    src_url = UploadImage.get_pic_url(public_id, r)
-    image = await ImageQuery.create(title, src_url, user, db)
+    access = access_service('can_add_image', user)
+    if not access.is_authorized:
+        raise HTTPException(status_code=access.status_code, detail=access.detail)
+    # public_id = UploadImage.generate_name_folder(user)
+    # r = UploadImage.upload(image_file.file, public_id)
+    # src_url = UploadImage.get_pic_url(public_id, r)
+    image = await ImageQuery.create(title, 'src_url', user, db)
     return image
 
 
@@ -34,7 +36,6 @@ async def get_image(image_id: int,
                     user: User = Depends(current_active_user),
                     db: AsyncSession = Depends(database),
                     cache: Redis = Depends(cache_database)):
-    # access_service('can_add_image', user)  # TODO
     image = await ImageQuery.read(image_id, db)
     if not image:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Image not found!')
@@ -55,11 +56,15 @@ async def update_image(image_id: int,
                        user: User = Depends(current_active_user),
                        db: AsyncSession = Depends(database),
                        cache: Redis = Depends(cache_database)):
-    access_service('can_add_image', user)  # TODO
-    image = await ImageQuery.update(image_id, image_data, db)
+    image = await ImageQuery.read(image_id, db)
     if not image:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Image not found!')
-    return image
+    access = access_service('can_update_image', user, image)
+    if not access.is_authorized:
+        raise HTTPException(status_code=access.status_code, detail=access.detail)
+    updated_image = await ImageQuery.update(image, image_data, db)
+
+    return updated_image
 
 
 @router.delete("/delete/{image_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -67,5 +72,10 @@ async def delete_image(image_id: int,
                        user: User = Depends(current_active_user),
                        db: AsyncSession = Depends(database),
                        cache: Redis = Depends(cache_database)):
-    access_service('can_add_image', user)  # TODO
-    await ImageQuery.delete(image_id, db)
+    image = await ImageQuery.read(image_id, db)
+    if not image:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Image not found!')
+    access = access_service('can_delete_image', user, image)
+    if not access.is_authorized:
+        raise HTTPException(status_code=access.status_code, detail=access.detail)
+    await ImageQuery.delete(image, db)

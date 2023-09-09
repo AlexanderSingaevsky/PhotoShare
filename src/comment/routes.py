@@ -4,7 +4,7 @@ from src.database.sql.alchemy_models import User
 from src.auth.service import current_active_user
 from src.comment.repository import CommentQuery
 from src.comment.schemas import CommentSchemaRequest, CommentSchemaResponse, CommentUpdateSchemaRequest
-
+from src.auth.utils.access import access_service
 from src.database.sql.postgres_conn import database
 
 router = APIRouter(prefix="/comment", tags=["comments"])
@@ -14,6 +14,9 @@ router = APIRouter(prefix="/comment", tags=["comments"])
 async def create_comment(body: CommentSchemaRequest,
                          user: User = Depends(current_active_user),
                          db: AsyncSession = Depends(database)):
+    access = access_service('can_add_comment', user)
+    if not access.is_authorized:
+        raise HTTPException(status_code=access.status_code, detail=access.detail)
     comment = await CommentQuery.create(body, user,  db)
     if not comment:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Image does not exist!')
@@ -33,9 +36,13 @@ async def update_comment(comment_id: int,
                          body: CommentUpdateSchemaRequest,
                          user: User = Depends(current_active_user),
                          db: AsyncSession = Depends(database)):
-    comment = await CommentQuery.update(comment_id, body, db)
+    comment = await CommentQuery.read(comment_id, db)
     if not comment:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Comment not found!')
+    access = access_service('can_update_comment', user, comment)
+    if not access.is_authorized:
+        raise HTTPException(status_code=access.status_code, detail=access.detail)
+    comment = await CommentQuery.update(comment, body, db)
     return comment
 
 
@@ -43,4 +50,10 @@ async def update_comment(comment_id: int,
 async def delete_comment(comment_id: int = Path(ge=1),
                          user: User = Depends(current_active_user),
                          db: AsyncSession = Depends(database)):
-    await CommentQuery.delete(comment_id, db)
+    comment = await CommentQuery.read(comment_id, db)
+    if not comment:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Comment not found!')
+    access = access_service('can_delete_comment', user, comment)
+    if not access.is_authorized:
+        raise HTTPException(status_code=access.status_code, detail=access.detail)
+    await CommentQuery.delete(comment, db)

@@ -36,10 +36,12 @@ class Permission(Base):
     can_add_tag: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     can_update_tag: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     can_delete_tag: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    can_add_comment: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     can_update_comment: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     can_delete_comment: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
 
     users: Mapped[list[User]] = relationship("User", back_populates="permission", lazy='noload')
+
 
 class Comment(Base):
     __tablename__ = "comments"
@@ -73,9 +75,6 @@ class Tag(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(50), nullable=False, unique=True)
     images: Mapped[list[Image]] = relationship("Image", secondary='image_tags', back_populates="tags")
-
-    # def __repr__(self):
-    #     return self.name
 
 
 class ImageTag(Base):
