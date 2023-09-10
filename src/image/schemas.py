@@ -12,14 +12,7 @@ class ImageSchemaUpdateRequest(ImageSchemaRequest):
     title: str = Field(default=None)
 
 
-T = typing.TypeVar("T")
-
-
-class BaseTransformation(BaseModel, typing.Generic[T]):
-    pass
-
-
-class ImageAIReplaceTransformation(BaseTransformation):
+class ImageAIReplaceTransformation(BaseModel):
     Object_to_detect: str = Field(default="")
     Replace_with: str = Field(default="")
 
@@ -27,44 +20,35 @@ class ImageAIReplaceTransformation(BaseTransformation):
         from_attributes: True
 
 
-class ImageScaleTransformation(BaseTransformation):
-    Width: int = Field(default=500)
-    Height: int = Field(default=500)
+class ImageScaleTransformation(BaseModel):
+    Width: int = Field(default=0)
+    Height: int = Field(default=0)
 
     class Config:
         from_attributes: True
 
 
-class ImageBlackAndWhiteTransformation(BaseTransformation):
+class ImageBlackAndWhiteTransformation(BaseModel):
     black_and_white: bool = Field(default=False)
 
     class Config:
         from_attributes: True
 
 
-class ImageRotationTransformation(BaseTransformation):
+class ImageRotationTransformation(BaseModel):
     angle: int = Field(default=0, le=360, ge=-360)
 
     class Config:
         from_attributes: True
 
 
-class ImageFlipModeTransformation(BaseTransformation):
-    flip_mode: str = Field(
-        default="ignore",
-        examples=["vflip", "hflip", "ignore", "auto_right", "auto_left"],
+class EditFormData(BaseModel):
+    ai_replace: typing.Optional[ImageAIReplaceTransformation] = Field(default=None)
+    scale: typing.Optional[ImageScaleTransformation] = Field(default=None)
+    black_and_white: typing.Optional[ImageBlackAndWhiteTransformation] = Field(
+        default=None
     )
-
-    class Config:
-        from_attributes: True
-
-
-class EditFormData(BaseTransformation):
-    ai_replace: ImageAIReplaceTransformation
-    scale: ImageScaleTransformation
-    black_and_white: ImageBlackAndWhiteTransformation
-    rotation: ImageRotationTransformation
-    flip_mode: ImageFlipModeTransformation
+    rotation: typing.Optional[ImageRotationTransformation] = Field(default=None)
 
 
 class ImageSchemaResponse(ImageSchemaRequest):

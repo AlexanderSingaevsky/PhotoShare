@@ -11,9 +11,10 @@ from src.image.repository import ImageQuery
 from src.image.schemas import (
     ImageSchemaResponse,
     ImageSchemaUpdateRequest,
+    EditFormData,
 )
 from src.auth.utils.access import access_service
-from src.image.utils.cloudinary_service import UploadImage
+from src.image.utils.cloudinary_service import UploadImage, ImageEditor
 
 router = APIRouter(prefix="/image", tags=["images"])
 
@@ -88,3 +89,26 @@ async def delete_image(
 ):
     access_service("can_add_image", user)  # TODO
     await ImageQuery.delete(image_id, db)
+
+
+@router.post(
+    "/transform/{image_id}",
+    response_model=ImageSchemaResponse,
+)
+async def transform_image(
+    image_id: int,
+    transformation_data: EditFormData,
+    user: User = Depends(current_active_user),
+    db: AsyncSession = Depends(database),
+    cache: Redis = Depends(cache_database),
+):
+    image = await get_image(image_id, user, db, cache)
+    original_img_url = image.cloudinary_url
+    edited_img_url = await ImageEditor().edit_image(
+        original_img_url, transformation_data
+    )
+    public_id = UploadImage.generate_name_folder(user, edited=True)
+    r = UploadImage.upload(edited_img_url, public_id)
+    edited_src_url = UploadImage.get_pic_url(public_id, r)
+    image = await ImageQuery.update(image_id, db, edited_src_url)
+    return image
