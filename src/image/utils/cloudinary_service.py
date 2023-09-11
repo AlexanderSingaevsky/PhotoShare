@@ -64,7 +64,11 @@ class ImageEditor(UploadImage):
 
     async def _edit_image_cloudinary(self, public_id, edit_data: EditFormData):
         transformation = []
-        if edit_data.ai_replace:
+        if (
+            edit_data.ai_replace
+            and edit_data.ai_replace.Object_to_detect
+            and edit_data.ai_replace.Replace_with
+        ):
             transformation.append(
                 {
                     "effect": f"gen_replace:from_{edit_data.ai_replace.Object_to_detect};to_{edit_data.ai_replace.Replace_with}"

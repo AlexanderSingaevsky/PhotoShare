@@ -55,7 +55,7 @@ class ImageSchemaResponse(ImageSchemaRequest):
     id: int
     owner_id: uuid.UUID
     cloudinary_url: str
-    edited_cloudinary_url: str = Field(default="")
+    edited_cloudinary_url: str | None
     created_at: datetime
     updated_at: datetime | None
 

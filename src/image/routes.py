@@ -87,8 +87,15 @@ async def delete_image(
     db: AsyncSession = Depends(database),
     cache: Redis = Depends(cache_database),
 ):
-    access_service("can_add_image", user)  # TODO
-    await ImageQuery.delete(image_id, db)
+    image = await ImageQuery.read(image_id, db)
+    if not image:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Image does not exist!"
+        )
+    # access = access_service("can_delete_image", user, image)
+    # if not access.is_authorized:
+    #     raise HTTPException(status_code=access.status_code, detail=access.detail)
+    await ImageQuery.delete(image, db)
 
 
 @router.post(

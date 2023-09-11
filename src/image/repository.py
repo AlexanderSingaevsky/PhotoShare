@@ -41,10 +41,6 @@ class ImageQuery:
         return image
 
     @staticmethod
-    async def delete(image_id: int, session: AsyncSession) -> None:
-        stmt = select(Image).filter_by(id=image_id)
-        result = await session.execute(stmt)
-        image = result.scalar_one_or_none()
-        if image:
-            await session.delete(image)
-            await session.commit()
+    async def delete(image: Image, session: AsyncSession) -> None:
+        await session.delete(image)
+        await session.commit()
