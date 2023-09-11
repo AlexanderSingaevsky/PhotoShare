@@ -3,6 +3,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database.sql.alchemy_models import User, Rating, Image
+from src.image.repository import ImageQuery
 
 
 class RatingQuery:
@@ -57,4 +58,6 @@ class RatingQuery:
             return None
         await db.delete(rating)
         await db.commit()
+        image = await ImageQuery.read(rating.image_id, db)
+        await RatingQuery._update_average_rating(image, db)
         return rating
