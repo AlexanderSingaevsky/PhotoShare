@@ -34,10 +34,12 @@ async def create_image(
     r = UploadImage.upload(image_file.file, public_id)
     src_url = UploadImage.get_pic_url(public_id, r)
     image = await ImageQuery.create(title, src_url, user, db)
+
     return image
 
 
 @router.get("/{image_id}", response_model=ImageSchemaResponse)
+
 async def get_image(
     image_id: int,
     user: User = Depends(current_active_user),
@@ -112,3 +114,4 @@ async def transform_image(
     edited_src_url = UploadImage.get_pic_url(public_id, r)
     image = await ImageQuery.update(image_id, db, edited_src_url)
     return image
+

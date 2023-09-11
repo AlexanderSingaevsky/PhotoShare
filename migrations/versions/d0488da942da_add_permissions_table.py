@@ -29,6 +29,7 @@ def upgrade() -> None:
                     sa.Column('can_add_tag', sa.Boolean(), nullable=False),
                     sa.Column('can_update_tag', sa.Boolean(), nullable=False),
                     sa.Column('can_delete_tag', sa.Boolean(), nullable=False),
+                    sa.Column('can_add_comment', sa.Boolean(), nullable=False),
                     sa.Column('can_update_comment', sa.Boolean(), nullable=False),
                     sa.Column('can_delete_comment', sa.Boolean(), nullable=False),
                     sa.PrimaryKeyConstraint('id'),
@@ -45,6 +46,7 @@ def upgrade() -> None:
                                    column('can_add_tag', sa.Boolean),
                                    column('can_update_tag', sa.Boolean),
                                    column('can_delete_tag', sa.Boolean),
+                                   column('can_add_comment', sa.Boolean),
                                    column('can_update_comment', sa.Boolean),
                                    column('can_delete_comment', sa.Boolean)
                                    )
@@ -53,24 +55,26 @@ def upgrade() -> None:
         {
             "id": 1,
             "role_name": "User",
-            "can_add_image": False,
+            "can_add_image": True,
             "can_update_image": False,
             "can_delete_image": False,
-            "can_add_tag": False,
+            "can_add_tag": True,
             "can_update_tag": False,
             "can_delete_tag": False,
+            "can_add_comment": True,
             "can_update_comment": False,
             "can_delete_comment": False
         },
         {
             "id": 2,
             "role_name": "Moderator",
-            "can_add_image": False,
+            "can_add_image": True,
             "can_update_image": False,
             "can_delete_image": True,
-            "can_add_tag": False,
+            "can_add_tag": True,
             "can_update_tag": True,
             "can_delete_tag": True,
+            "can_add_comment": True,
             "can_update_comment": True,
             "can_delete_comment": False
         },
@@ -83,6 +87,7 @@ def upgrade() -> None:
             "can_add_tag": True,
             "can_update_tag": True,
             "can_delete_tag": True,
+            "can_add_comment": True,
             "can_update_comment": True,
             "can_delete_comment": True
         }

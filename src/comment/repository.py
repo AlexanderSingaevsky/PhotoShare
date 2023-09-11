@@ -3,7 +3,7 @@ from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.database.sql.alchemy_models import Comment, User
+from src.database.sql.alchemy_models import Comment, User, Image
 
 
 class CommentQuery:
@@ -23,22 +23,14 @@ class CommentQuery:
         return comment
 
     @staticmethod
-    async def update(comment_id, body, db) -> Comment | None:
-        sq = select(Comment).filter_by(id=comment_id)
-        result = await db.execute(sq)
-        comment = result.scalar_one_or_none()
-        if comment:
-            comment.text = body.text
-            await db.commit()
-            await db.refresh(comment)
+    async def update(comment, body, db) -> Comment | None:
+        comment.text = body.text
+        await db.commit()
+        await db.refresh(comment)
         return comment
 
     @staticmethod
-    async def delete(comment_id: int, db: AsyncSession) -> None:
-        sq = select(Comment).filter_by(id=comment_id)
-        result = await db.execute(sq)
-        comment = result.scalar_one_or_none()
-        if comment:
-            await db.delete(comment)
-            await db.commit()
+    async def delete(comment: Comment, db: AsyncSession) -> None:
+        await db.delete(comment)
+        await db.commit()
 
