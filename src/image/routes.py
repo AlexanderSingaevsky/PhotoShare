@@ -3,9 +3,9 @@ from fastapi import APIRouter, HTTPException, Depends, status, UploadFile, File,
 from sqlalchemy.ext.asyncio import AsyncSession
 from redis.asyncio.client import Redis
 
-from src.database.sql.models import User
+from src.database.sql.alchemy_models import User
 from src.auth.service import current_active_user
-from src.database.sql.postgres import database
+from src.database.sql.postgres_conn import database
 from src.database.cache.redis_conn import cache_database
 from src.image.repository import ImageQuery
 from src.image.schemas import (
@@ -72,10 +72,6 @@ async def update_image(
     cache: Redis = Depends(cache_database),
 ):
     image = await get_image(image_id, user, db, cache)
-    if not image:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Image does not exist!"
-        )
     access_service("can_update_image", user, image)
     image = await ImageQuery.update(image, db, image_data=image_data)
     return image

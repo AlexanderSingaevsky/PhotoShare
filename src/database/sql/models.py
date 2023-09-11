@@ -30,6 +30,7 @@ class User(SQLAlchemyBaseUserTableUUID, Base):
     created_at: Mapped[DateTime] = mapped_column(
         "crated_at", DateTime, default=func.now()
     )
+
     oauth_accounts: Mapped[list[OAuthAccount]] = relationship(
         "OAuthAccount", lazy="joined"
     )
@@ -71,6 +72,7 @@ class Permission(Base):
     can_delete_comment: Mapped[bool] = mapped_column(
         Boolean, nullable=False, default=False
     )
+
     users: Mapped[list[User]] = relationship(
         "User", back_populates="permission", lazy="noload"
     )
@@ -89,6 +91,7 @@ class Comment(Base):
     updated_at: Mapped[datetime] = mapped_column(
         "updated_at", DateTime, default=None, onupdate=func.now(), nullable=True
     )
+
     owner: Mapped[User] = relationship("User", back_populates="comments")
     image: Mapped["Image"] = relationship("Image", back_populates="comments")
 
@@ -103,6 +106,7 @@ class Image(Base):
         String(300), nullable=False, default="placeholder"
     )
     rating: Mapped[Numeric(3, 2)] = mapped_column(Numeric(3, 2), default=0.00)
+    edited_cloudinary_url: Mapped[str] = mapped_column(String(300), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime, default=None, onupdate=func.now(), nullable=True
