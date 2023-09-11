@@ -36,6 +36,9 @@ class TagRepository:
             .join(ImageTag, ImageTag.image_id == Image.id)
             .join(Tag, Tag.id == ImageTag.tag_id)
             .where(Tag.name.in_(tag_names))
+            .union_all(
+                select(Image).filter(Image.title.in_(tag_names))
+            )
         )
         images = await session.execute(stmt)
         return images.scalars().all()
