@@ -2,7 +2,7 @@ from fastapi import HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.database.sql.alchemy_models import User, Rating, Image
+from src.database.sql.models import User, Rating, Image
 from src.image.repository import ImageQuery
 
 

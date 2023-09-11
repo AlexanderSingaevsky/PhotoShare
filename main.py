@@ -6,8 +6,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from redis.asyncio.client import Redis
 
 from src.auth.service import current_active_user
-from src.database.sql.alchemy_models import User
-from src.database.sql.postgres_conn import database
+from src.database.sql.models import User
+from src.database.sql.postgres import database
 from src.database.cache.redis_conn import cache_database
 from src.auth.utils.access import AccessService
 

@@ -1,4 +1,4 @@
-from src.database.sql.alchemy_models import Permission
+from src.database.sql.models import Permission
 
 
 permissions = [

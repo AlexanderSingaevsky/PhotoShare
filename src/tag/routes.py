@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from src.database.sql.postgres_conn import database
-from src.database.sql.alchemy_models import User
+from src.database.sql.postgres import database
+from src.database.sql.models import User
 from src.auth.service import current_active_user
 from src.tag.schemas import TagSchemaRequest
 from src.tag.repository import TagRepository
-from src.image.repository import ImageQuery
+from src.image.routes import get_image
 from src.auth.utils.access import access_service
 
 router = APIRouter(prefix="/tag", tags=["tags"])
@@ -17,14 +17,8 @@ async def create_tag(
     user: User = Depends(current_active_user),
     session: AsyncSession = Depends(database),
 ):
-    image = await ImageQuery.read(tag_data.image_id, session)
-    if not image:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Image does not exist!"
-        )
-    access = access_service("can_add_tag", user, image)
-    if not access.is_authorized:
-        raise HTTPException(status_code=access.status_code, detail=access.detail)
+    image = await get_image(tag_data.image_id, user, session)
+    access_service("can_add_tag", user, image)
     await TagRepository.create(image, tag_data, session)
     return {"detail": "tags added"}
 
@@ -35,12 +29,6 @@ async def delete_tags(
     user: User = Depends(current_active_user),
     session: AsyncSession = Depends(database),
 ):
-    image = await ImageQuery.read(tag_data.image_id, session)
-    if not image:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Image does not exist!"
-        )
-    access = access_service("can_delete_tag", user, image)
-    if not access.is_authorized:
-        raise HTTPException(status_code=access.status_code, detail=access.detail)
+    image = await get_image(tag_data.image_id, user, session)
+    access_service("can_delete_tag", user, image)
     await TagRepository.delete(image, tag_data, session)

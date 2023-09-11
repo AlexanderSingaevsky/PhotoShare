@@ -2,9 +2,9 @@ from fastapi import APIRouter, Depends, status, HTTPException, Path
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.service import current_active_user
-from src.database.sql.alchemy_models import User
-from src.database.sql.postgres_conn import database
-from src.image.repository import ImageQuery
+from src.database.sql.models import User
+from src.database.sql.postgres import database
+from src.image.routes import get_image
 from src.rating.repository import RatingQuery
 from src.rating.schemas import (
     RatingSchemaResponse,
@@ -40,7 +40,7 @@ async def create_rating(
     user: User = Depends(current_active_user),
     db: AsyncSession = Depends(database),
 ):
-    image = await ImageQuery.read(body.image_id, db)
+    image = await get_image(body.image_id, user, db)
     if not image:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Image does not exist!"

@@ -1,7 +1,7 @@
 # tag related queries here
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from src.database.sql.alchemy_models import Tag, Image, ImageTag
+from src.database.sql.models import Tag, Image, ImageTag
 from src.tag.schemas import TagSchemaRequest
 
 

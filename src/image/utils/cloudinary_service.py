@@ -5,7 +5,7 @@ from datetime import datetime
 import cloudinary.uploader
 
 from src.config import settings
-from src.database.sql.alchemy_models import User
+from src.database.sql.models import User
 from src.image.schemas import EditFormData
 
 

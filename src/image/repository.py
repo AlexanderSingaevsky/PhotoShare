@@ -1,7 +1,7 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.database.sql.alchemy_models import Image, User
+from src.database.sql.models import Image, User
 from src.image.schemas import ImageSchemaUpdateRequest
 
 

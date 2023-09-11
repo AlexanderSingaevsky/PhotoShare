@@ -17,7 +17,7 @@ from starlette.responses import JSONResponse
 from src.auth.utils.email import send_email_for_reset_pswd, send_email_verification
 from src.auth.utils.send_post import send_post_request
 from src.config import settings
-from src.database.sql.postgres_conn import User, get_user_db
+from src.database.sql.postgres import User, get_user_db
 
 # should be remade to get it from .env
 google_oauth_client = GoogleOAuth2(

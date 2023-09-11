@@ -5,7 +5,7 @@ from fastapi_users_db_sqlalchemy import SQLAlchemyUserDatabase
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.database.sql.alchemy_models import Base, User
+from src.database.sql.models import Base, User
 from src.database.sql.default_records import permissions
 from src.config import settings
 

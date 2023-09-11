@@ -3,7 +3,7 @@ from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.database.sql.alchemy_models import Comment, User, Image
+from src.database.sql.models import Comment, User, Image
 
 
 class CommentQuery:
