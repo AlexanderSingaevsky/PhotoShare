@@ -23,29 +23,22 @@ class ImageQuery:
 
     @staticmethod
     async def update(
-        image_id: int,
+        image: Image,
         session: AsyncSession,
         edited_cloudinary_url: str = None,
         image_data: ImageSchemaUpdateRequest = None,
     ) -> Image:
-        stmt = select(Image).where(Image.id == image_id)
-        image = await session.execute(stmt)
-        image = image.scalars().unique().one_or_none()
-        if image:
-            if image_data:
-                image.title = image_data.title
-            if edited_cloudinary_url:
-                image.edited_cloudinary_url = edited_cloudinary_url
-            await session.commit()
-            await session.refresh(image)
+
+        if image_data:
+            image.title = image_data.title
+        if edited_cloudinary_url:
+            image.edited_cloudinary_url = edited_cloudinary_url
+        await session.commit()
+        await session.refresh(image)
         return image
 
     @staticmethod
-    async def delete(image_id: int, session: AsyncSession) -> None:
-        stmt = select(Image).filter_by(id=image_id)
-        result = await session.execute(stmt)
-        image = result.scalar_one_or_none()
-        if image:
-            await session.delete(image)
-            await session.commit()
+    async def delete(image: Image, session: AsyncSession) -> None:
+        await session.delete(image)
+        await session.commit()
 

@@ -5,7 +5,7 @@ from fastapi_users_db_sqlalchemy import (
     SQLAlchemyBaseUserTableUUID,
     SQLAlchemyBaseOAuthAccountTableUUID,
 )
-from sqlalchemy import String, Integer, DateTime, Boolean, func, Uuid
+from sqlalchemy import String, Integer, DateTime, Boolean, func, Uuid, Numeric
 
 
 from sqlalchemy.orm import DeclarativeBase, relationship, Mapped, mapped_column
@@ -81,8 +81,8 @@ class Image(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=func.now())
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=None, onupdate=func.now(), nullable=True)
     owner: Mapped[User] = relationship("User", back_populates="images", lazy='noload')
-    tags: Mapped[list['Tag']] = relationship("Tag", secondary='image_tags', back_populates="images", lazy='joined')
-    comments: Mapped[list[Comment]] = relationship('Comment', back_populates='image', lazy='joined')
+    tags: Mapped[list['Tag']] = relationship("Tag", secondary='image_tags', back_populates="images", lazy='joined', cascade="all, delete")
+    comments: Mapped[list[Comment]] = relationship('Comment', back_populates='image', lazy='joined', cascade="all, delete")
 
 
 
