@@ -26,7 +26,10 @@ class RatingQuery:
     @staticmethod
     async def create(body, user: User, image: Image, db: AsyncSession) -> Rating:
         rating = await db.scalar(
-            select(Rating).where((Rating.owner_id == user.id) & (Rating.image_id == image.id)))
+            select(Rating).where(
+                (Rating.owner_id == user.id) & (Rating.image_id == image.id)
+            )
+        )
         if rating:
             rating.value = body.value
         else:
@@ -40,7 +43,10 @@ class RatingQuery:
     @staticmethod
     async def update(rating_id: int, body, user, db) -> Rating | None:
         rating = await db.scalar(
-            select(Rating).where((Rating.owner_id == user.id) & (Rating.id == rating_id)))
+            select(Rating).where(
+                (Rating.owner_id == user.id) & (Rating.id == rating_id)
+            )
+        )
         if not rating:
             return None
         rating.value = body.value
@@ -53,7 +59,10 @@ class RatingQuery:
     @staticmethod
     async def delete(rating_id: int, user, db: AsyncSession):
         rating = await db.scalar(
-            select(Rating).where((Rating.owner_id == user.id) & (Rating.id == rating_id)))
+            select(Rating).where(
+                (Rating.owner_id == user.id) & (Rating.id == rating_id)
+            )
+        )
         if not rating:
             return None
         await db.delete(rating)

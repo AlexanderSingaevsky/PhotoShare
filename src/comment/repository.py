@@ -33,4 +33,3 @@ class CommentQuery:
     async def delete(comment: Comment, db: AsyncSession) -> None:
         await db.delete(comment)
         await db.commit()
-

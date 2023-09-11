@@ -33,7 +33,7 @@ class AccessService:
             detail = 'Access Granted.'
             return PermissionStatus(True, status.HTTP_200_OK, detail)
         else:
-            detail = 'You are not allowed to do this operation'
+            detail = "You are not allowed to do this operation"
             return PermissionStatus(False, status.HTTP_403_FORBIDDEN, detail)
 
     @staticmethod

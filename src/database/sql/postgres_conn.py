@@ -17,11 +17,13 @@ class Postgres:
         host = settings.postgres_host
         port = settings.postgres_port
         db = settings.postgres_db
-        url = f'postgresql+asyncpg://{user}:{pwd}@{host}:{port}/{db}?async_fallback=True'
+        url = (
+            f"postgresql+asyncpg://{user}:{pwd}@{host}:{port}/{db}?async_fallback=True"
+        )
 
         self.engine = create_async_engine(url, echo=False)
         self.async_session = async_sessionmaker(self.engine, expire_on_commit=False)
-        print('POSTGRES_CONNECTOR_INITIALIZED')
+        print("POSTGRES_CONNECTOR_INITIALIZED")
 
     async def __call__(self):
         async with self.async_session() as session:
@@ -52,6 +54,6 @@ async def main():
     await db.create_database()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
     asyncio.run(main())

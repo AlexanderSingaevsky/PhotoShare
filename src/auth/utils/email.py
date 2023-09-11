@@ -20,18 +20,19 @@ conf = ConnectionConfig(
     MAIL_SSL_TLS=True,
     USE_CREDENTIALS=True,
     VALIDATE_CERTS=True,
-    TEMPLATE_FOLDER=Path(__file__).parent.parent.parent.parent / 'templates',
+    TEMPLATE_FOLDER=Path(__file__).parent.parent.parent.parent / "templates",
 )
 
 
-async def send_email_for_reset_pswd(email: EmailStr, username: str, reset_token: str, host: str):
+async def send_email_for_reset_pswd(
+    email: EmailStr, username: str, reset_token: str, host: str
+):
     try:
-
         message = MessageSchema(
             subject="Password change",
             recipients=[email],
             template_body={"host": host, "username": username, "token": reset_token},
-            subtype=MessageType.html
+            subtype=MessageType.html,
         )
 
         fm = FastMail(conf)
@@ -41,13 +42,15 @@ async def send_email_for_reset_pswd(email: EmailStr, username: str, reset_token:
         print(e)
 
 
-async def send_email_verification(email: EmailStr, username: str, verify_token: str, host: str):
+async def send_email_verification(
+    email: EmailStr, username: str, verify_token: str, host: str
+):
     try:
         message = MessageSchema(
             subject="Confirm your email ",
             recipients=[email],
             template_body={"host": host, "username": username, "token": verify_token},
-            subtype=MessageType.html
+            subtype=MessageType.html,
         )
 
         fm = FastMail(conf)

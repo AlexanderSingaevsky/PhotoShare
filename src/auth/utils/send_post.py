@@ -32,4 +32,3 @@ async def send_post_request(request: Request, data: str, request_url: str):
     except Exception as e:
         print(f"Помилка: {e}")
         return {"error": "An error occurred"}
-

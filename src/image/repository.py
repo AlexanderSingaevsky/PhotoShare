@@ -28,7 +28,6 @@ class ImageQuery:
         edited_cloudinary_url: str = None,
         image_data: ImageSchemaUpdateRequest = None,
     ) -> Image:
-
         if image_data:
             image.title = image_data.title
         if edited_cloudinary_url:
@@ -41,4 +40,3 @@ class ImageQuery:
     async def delete(image: Image, session: AsyncSession) -> None:
         await session.delete(image)
         await session.commit()
-

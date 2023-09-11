@@ -24,10 +24,3 @@ class CommentSchemaResponse(CommentSchemaRequest):
 
     class Config:
         from_attributes: True
-
-
-
-
-
-
-

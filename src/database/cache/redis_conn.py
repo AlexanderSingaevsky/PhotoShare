@@ -5,9 +5,9 @@ from src.config import settings
 
 class Redis:
     def __init__(self):
-        self.redis_url = f'redis://{settings.redis_host}:{settings.redis_port}'
+        self.redis_url = f"redis://{settings.redis_host}:{settings.redis_port}"
         self.redis = None
-        print('REDIS_CONNECTOR_INITIALIZED')
+        print("REDIS_CONNECTOR_INITIALIZED")
 
     async def __call__(self):
         if self.redis is None:
