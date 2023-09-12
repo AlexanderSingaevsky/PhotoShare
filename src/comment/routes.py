@@ -1,3 +1,15 @@
+"""
+Comment API Routes
+
+This module contains FastAPI routes related to comments on images.
+
+Routes:
+- create_comment: Create a new comment for an image.
+- get_comment: Retrieve a specific comment by its ID.
+- update_comment: Update an existing comment.
+- delete_comment: Delete a comment.
+"""
+
 from fastapi import APIRouter, Path, Depends, status, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.database.sql.models import User
@@ -26,6 +38,14 @@ async def create_comment(
     user: User = Depends(current_active_user),
     db: AsyncSession = Depends(database),
 ):
+    """
+    Create a new comment for an image.
+
+    :param body: CommentSchemaRequest: The comment data.
+    :param user: User: The current user creating the comment.
+    :param db: AsyncSession: The database session.
+    :return: The created comment.
+    """
     await get_image(body.image_id, user, db)
     access_service("can_add_comment", user)
     comment = await CommentQuery.create(body, user, db)
@@ -38,6 +58,14 @@ async def get_comment(
     user: User = Depends(current_active_user),
     db: AsyncSession = Depends(database),
 ):
+    """
+    Get a specific comment by its ID.
+
+    :param comment_id: int: The ID of the comment to retrieve.
+    :param user: User: The current user.
+    :param db: AsyncSession: The database session.
+    :return: The comment if found, or raise HTTPException if not found.
+    """
     comment = await CommentQuery.read(comment_id, db)
     if not comment:
         raise HTTPException(
@@ -53,6 +81,15 @@ async def update_comment(
     user: User = Depends(current_active_user),
     db: AsyncSession = Depends(database),
 ):
+    """
+   Update an existing comment.
+
+   :param comment_id: int: The ID of the comment to update.
+   :param body: CommentUpdateSchemaRequest: The updated comment data.
+   :param user: User: The current user.
+   :param db: AsyncSession: The database session.
+   :return: The updated comment.
+   """
     comment = await CommentQuery.read(comment_id, db)
     if not comment:
         raise HTTPException(
@@ -69,6 +106,14 @@ async def delete_comment(
     user: User = Depends(current_active_user),
     db: AsyncSession = Depends(database),
 ):
+    """
+    Delete a comment.
+
+    :param comment_id: int: The ID of the comment to delete.
+    :param user: User: The current user.
+    :param db: AsyncSession: The database session.
+    :return: HTTP 204 No Content on success or raise HTTPException if not found.
+    """
     comment = await CommentQuery.read(comment_id, db)
     if not comment:
         raise HTTPException(
