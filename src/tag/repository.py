@@ -33,3 +33,18 @@ class TagRepository:
         session.add(image)
         await session.commit()
         return image
+
+
+    @staticmethod
+    async def search_images_by_tags(tag_names: list[str], session: AsyncSession) -> list[Image]:
+        stmt = (
+            select(Image)
+            .join(ImageTag, ImageTag.image_id == Image.id)
+            .join(Tag, Tag.id == ImageTag.tag_id)
+            .where(Tag.name.in_(tag_names))
+            .union_all(
+                select(Image).filter(Image.title.in_(tag_names))
+            )
+        )
+        images = await session.execute(stmt)
+        return images.scalars().all()

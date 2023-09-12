@@ -32,3 +32,12 @@ async def delete_tags(
     image = await get_image(tag_data.image_id, user, session)
     access_service("can_delete_tag", user, image)
     await TagRepository.delete(image, tag_data, session)
+
+@router.get("/search")
+async def search_images_by_tags(tag_name: str, session: AsyncSession = Depends(database)):
+    tags = await TagRepository.search_tags(tag_name, session)
+    if not tags:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Tag not found')
+    image_ids = [tag.image_id for tag in tags]
+    images = await ImageQuery.search_images_by_tags(image_ids, session)
+    return images
