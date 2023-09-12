@@ -1,12 +1,27 @@
+"""
+Image API Routes
+
+This module contains FastAPI routes related to images.
+
+Routes:
+- get_image: Retrieve an image by its ID.
+- create_image: Create a new image.
+- search_image: Search for images.
+- update_image: Update an image.
+- delete_image: Delete an image.
+- transform_image: Transform an image.
+"""
+
 from fastapi import APIRouter, HTTPException, Depends, status, UploadFile, File, Form
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from redis.asyncio.client import Redis
 
-from src.database.sql.alchemy_models import User
+
 from src.auth.service import current_active_user
-from src.database.sql.postgres_conn import database
+from src.database.sql.postgres import database
 from src.database.cache.redis_conn import cache_database
+from src.database.sql.models import User
 from src.image.repository import ImageQuery
 from src.image.schemas import (
     ImageSchemaResponse,
@@ -26,6 +41,15 @@ async def get_image(
     db: AsyncSession = Depends(database),
     cache: Redis = Depends(cache_database),
 ):
+    """
+    Retrieve an image by its ID.
+
+    :param image_id: int: The ID of the image to retrieve.
+    :param user: User: The current user.
+    :param db: AsyncSession: The database session.
+    :param cache: Redis: The Redis cache.
+    :return: An image object.
+    """
     image = await ImageQuery.read(image_id, db)
     if not image:
         raise HTTPException(
@@ -44,6 +68,16 @@ async def create_image(
     db: AsyncSession = Depends(database),
     cache: Redis = Depends(cache_database),
 ):
+    """
+    Create a new image.
+
+    :param title: str: The title of the image.
+    :param image_file: UploadFile: The image file to upload.
+    :param user: User: The current user.
+    :param db: AsyncSession: The database session.
+    :param cache: Redis: The Redis cache.
+    :return: The created image object.
+    """
     access_service("can_add_image", user)
     public_id = UploadImage.generate_name_folder(user)
     r = UploadImage.upload(image_file.file, public_id)
@@ -60,6 +94,15 @@ async def search_image(
     db: AsyncSession = Depends(database),
     cache: Redis = Depends(cache_database),
 ):
+    """
+    Search for images.
+
+    :param image_search_string: str: The search string.
+    :param user: User: The current user.
+    :param db: AsyncSession: The database session.
+    :param cache: Redis: The Redis cache.
+    :return: Not implemented.
+    """
     raise HTTPException(status_code=status.HTTP_501_NOT_IMPLEMENTED)
 
 
@@ -71,6 +114,16 @@ async def update_image(
     db: AsyncSession = Depends(database),
     cache: Redis = Depends(cache_database),
 ):
+    """
+    Update an image.
+
+    :param image_id: int: The ID of the image to update.
+    :param image_data: ImageSchemaUpdateRequest: The updated image data.
+    :param user: User: The current user.
+    :param db: AsyncSession: The database session.
+    :param cache: Redis: The Redis cache.
+    :return: The updated image object.
+    """
     image = await get_image(image_id, user, db, cache)
     access_service("can_update_image", user, image)
     image = await ImageQuery.update(image, db, image_data=image_data)
@@ -84,6 +137,15 @@ async def delete_image(
     db: AsyncSession = Depends(database),
     cache: Redis = Depends(cache_database),
 ):
+    """
+    Delete an image.
+
+    :param image_id: int: The ID of the image to delete.
+    :param user: User: The current user.
+    :param db: AsyncSession: The database session.
+    :param cache: Redis: The Redis cache.
+    :return: None.
+    """
     image = await get_image(image_id, user, db, cache)
     access_service("can_delete_image", user, image)
     await ImageQuery.delete(image, db)
@@ -100,6 +162,19 @@ async def transform_image(
     db: AsyncSession = Depends(database),
     cache: Redis = Depends(cache_database),
 ):
+    """
+    Transform an image.
+
+    This endpoint allows users to apply transformations to an image, such as cropping, resizing, or adding filters.
+    The transformed image is then stored and associated with the original image.
+
+    :param image_id: int: The ID of the image to transform.
+    :param transformation_data: EditFormData: The transformation data, including details of the desired transformations.
+    :param user: User: The current user.
+    :param db: AsyncSession: The database session.
+    :param cache: Redis: The Redis cache.
+    :return: The transformed image object.
+    """
     image = await get_image(image_id, user, db, cache)
     access_service("can_update_image", user, image)
     original_img_url = image.cloudinary_url
