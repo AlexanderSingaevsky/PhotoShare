@@ -42,9 +42,9 @@ class UploadImage:
 
 class ImageEditor(UploadImage):
     async def edit_image(
-        self,
-        original_img_url: str,
-        edit_data: EditFormData,
+            self,
+            original_img_url: str,
+            edit_data: EditFormData,
     ):
         match = re.search(r"Memento/(.*)/(\d{2}-\d{2}-\d{4})/(.*)", original_img_url)
         if not match:
@@ -65,9 +65,9 @@ class ImageEditor(UploadImage):
     async def _edit_image_cloudinary(self, public_id, edit_data: EditFormData):
         transformation = []
         if (
-            edit_data.ai_replace
-            and edit_data.ai_replace.Object_to_detect
-            and edit_data.ai_replace.Replace_with
+                edit_data.ai_replace
+                and edit_data.ai_replace.Object_to_detect
+                and edit_data.ai_replace.Replace_with
         ):
             transformation.append(
                 {
@@ -89,3 +89,12 @@ class ImageEditor(UploadImage):
         return cloudinary.CloudinaryImage(public_id).image(
             transformation=transformation
         )
+
+
+def init_cloudinary():
+    cloudinary.config(
+        cloud_name=settings.cloudinary_name,
+        api_key=settings.cloudinary_api_key,
+        api_secret=settings.cloudinary_api_secret,
+        secure=True,
+    )

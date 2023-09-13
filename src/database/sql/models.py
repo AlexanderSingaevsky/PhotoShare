@@ -122,6 +122,19 @@ class Image(Base):
     comments: Mapped[list[Comment]] = relationship(
         "Comment", back_populates="image", lazy="joined", cascade="all, delete"
     )
+    QR: Mapped["QRcode"] = relationship(
+        "QRcode", back_populates="image", cascade="all, delete-orphan"
+    )
+
+
+class QRcode(Base):
+    __tablename__ = "Qr_codes"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    url: Mapped[str] = mapped_column(String(255), nullable=False)
+
+    photo_id: Mapped[int] = mapped_column(Integer, ForeignKey("images.id"))
+    image: Mapped["Image"] = relationship("Image", back_populates="QR")
 
 
 class Tag(Base):

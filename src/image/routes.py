@@ -3,9 +3,9 @@ from fastapi import APIRouter, HTTPException, Depends, status, UploadFile, File,
 from sqlalchemy.ext.asyncio import AsyncSession
 from redis.asyncio.client import Redis
 
-from src.database.sql.alchemy_models import User
+from src.database.sql.models import User
 from src.auth.service import current_active_user
-from src.database.sql.postgres_conn import database
+from src.database.sql.postgres import database
 from src.database.cache.redis_conn import cache_database
 from src.image.repository import ImageQuery
 from src.image.schemas import (
@@ -21,10 +21,10 @@ router = APIRouter(prefix="/image", tags=["images"])
 
 @router.get("/{image_id}", response_model=ImageSchemaResponse)
 async def get_image(
-    image_id: int,
-    user: User = Depends(current_active_user),
-    db: AsyncSession = Depends(database),
-    cache: Redis = Depends(cache_database),
+        image_id: int,
+        user: User = Depends(current_active_user),
+        db: AsyncSession = Depends(database),
+        cache: Redis = Depends(cache_database),
 ):
     image = await ImageQuery.read(image_id, db)
     if not image:
@@ -38,11 +38,11 @@ async def get_image(
     "/create", response_model=ImageSchemaResponse, status_code=status.HTTP_201_CREATED
 )
 async def create_image(
-    title: str = Form(),
-    image_file: UploadFile = File(),
-    user: User = Depends(current_active_user),
-    db: AsyncSession = Depends(database),
-    cache: Redis = Depends(cache_database),
+        title: str = Form(),
+        image_file: UploadFile = File(),
+        user: User = Depends(current_active_user),
+        db: AsyncSession = Depends(database),
+        cache: Redis = Depends(cache_database),
 ):
     access_service("can_add_image", user)
     public_id = UploadImage.generate_name_folder(user)
@@ -53,23 +53,33 @@ async def create_image(
     return image
 
 
+@router.post("/qr_code/")
+async def make_qr(
+        photo_id: int,
+        current_user: User = Depends(current_active_user),
+        db: AsyncSession = Depends(database),
+):
+    data = await ImageQuery.get_qr_url(photo_id, db)
+    return data
+
+
 @router.get("/search/{image_search_string}")
 async def search_image(
-    image_search_string: str,
-    user: User = Depends(current_active_user),
-    db: AsyncSession = Depends(database),
-    cache: Redis = Depends(cache_database),
+        image_search_string: str,
+        user: User = Depends(current_active_user),
+        db: AsyncSession = Depends(database),
+        cache: Redis = Depends(cache_database),
 ):
     raise HTTPException(status_code=status.HTTP_501_NOT_IMPLEMENTED)
 
 
 @router.put("/update/{image_id}", response_model=ImageSchemaResponse)
 async def update_image(
-    image_id: int,
-    image_data: ImageSchemaUpdateRequest = None,
-    user: User = Depends(current_active_user),
-    db: AsyncSession = Depends(database),
-    cache: Redis = Depends(cache_database),
+        image_id: int,
+        image_data: ImageSchemaUpdateRequest = None,
+        user: User = Depends(current_active_user),
+        db: AsyncSession = Depends(database),
+        cache: Redis = Depends(cache_database),
 ):
     image = await get_image(image_id, user, db, cache)
     access_service("can_update_image", user, image)
@@ -79,10 +89,10 @@ async def update_image(
 
 @router.delete("/delete/{image_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_image(
-    image_id: int,
-    user: User = Depends(current_active_user),
-    db: AsyncSession = Depends(database),
-    cache: Redis = Depends(cache_database),
+        image_id: int,
+        user: User = Depends(current_active_user),
+        db: AsyncSession = Depends(database),
+        cache: Redis = Depends(cache_database),
 ):
     image = await get_image(image_id, user, db, cache)
     access_service("can_delete_image", user, image)
@@ -94,11 +104,11 @@ async def delete_image(
     response_model=ImageSchemaResponse,
 )
 async def transform_image(
-    image_id: int,
-    transformation_data: EditFormData,
-    user: User = Depends(current_active_user),
-    db: AsyncSession = Depends(database),
-    cache: Redis = Depends(cache_database),
+        image_id: int,
+        transformation_data: EditFormData,
+        user: User = Depends(current_active_user),
+        db: AsyncSession = Depends(database),
+        cache: Redis = Depends(cache_database),
 ):
     image = await get_image(image_id, user, db, cache)
     access_service("can_update_image", user, image)
