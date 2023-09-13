@@ -31,6 +31,12 @@ app.include_router(rating, prefix="/api")
 
 @app.get("/")
 def read_root():
+    """
+    Get the root endpoint.
+
+    Returns:
+        dict: A dictionary with a single key "message" and the value "Hello World".
+"""
     return {"message": "Hello World"}
 
 
@@ -38,6 +44,14 @@ def read_root():
 async def healthchecker(
     db: AsyncSession = Depends(database), cache: Redis = Depends(cache_database)
 ):
+    """
+        Check the health of the database and cache.
+
+        :param db: AsyncSession = Depends(database): The database session.
+        :param cache: Redis = Depends(cache_database): The cache database.
+
+        :return: dict: A dictionary with a message indicating the status of the databases.
+"""
     print("postgres connection check...")
     await db.execute(text("SELECT 1"))
     print("redis connection check...")
@@ -47,6 +61,13 @@ async def healthchecker(
 
 @app.get("/example/user-authenticated")
 async def authenticated_route(user: User = Depends(current_active_user)):
+    """
+    The authenticated_route function is a route that requires authentication.
+    It will return the email of the user and all images associated with that user.
+
+    :param user: User: Get the user object from the database
+    :return: A dictionary with the email and images of the user
+"""
     print(user.images)
     return {"email": user.email, "images": user.images}
 

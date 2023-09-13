@@ -1,11 +1,6 @@
 from pathlib import Path
 
-import httpx
-import aiohttp
-from aiohttp import ClientSession, ContentTypeError
-
 from fastapi import APIRouter, Request
-from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 from starlette.responses import JSONResponse
 
@@ -48,10 +43,26 @@ router.include_router(
 
 @router.get("/auth/set_new_password/{token}", tags=["auth"])
 async def reset_password_form(request: Request):
+    """
+    The reset_password_form function is a view function that renders the reset_password_form.html template.
+
+    :param request: Request: Get the data from the form
+    :return: The reset_password_form
+"""
     return templates.TemplateResponse("reset_password_form.html", {"request": request})
 
 
 @router.get("/auth/verify/{token}", tags=["auth"])
 async def confirm_email(request: Request, token: str):
+    """
+    The confirm_email function is used to confirm a user's email address.
+        It takes in the request and token as parameters, and returns a JSONResponse object.
+        The function sends a POST request to the auth/verify endpoint with the token as its body,
+        then returns the result of that POST request.
+
+    :param request: Request: Get the request object from fastapi
+    :param token: str: Get the token from the url
+    :return: A JSONResponse with result
+"""
     result = await send_post_request(request, token, "auth/verify")
     return JSONResponse(result)

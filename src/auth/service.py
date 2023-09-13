@@ -30,10 +30,38 @@ bearer_transport = BearerTransport(tokenUrl="auth/jwt/login")
 
 
 class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
+    """
+    User Manager Class
+
+    This class provides user management functionality, including registration,
+    password reset, and email verification.
+
+    Attributes:
+        reset_password_token_secret (str): The secret for generating reset password tokens.
+        verification_token_secret (str): The secret for generating email verification tokens.
+
+    Methods:
+        on_after_register(self, user: User, request: Optional[Request] = None) -> JSONResponse:
+            Perform actions after a user registers.
+
+        on_after_forgot_password(self, user: User, token: str, request: Optional[Request] = None):
+            Perform actions after a user requests a password reset.
+
+        on_after_request_verify(self, user: User, token: str, request: Optional[Request] = None):
+            Perform actions after a user requests email verification.
+    """
     reset_password_token_secret = SECRET
     verification_token_secret = SECRET
 
     async def on_after_register(self, user: User, request: Optional[Request] = None):
+        """
+        Perform actions after a user registers.
+
+        :param user (User): The registered user.
+        :param request (Optional[Request]): The request object (optional).
+
+        :return: JSONResponse: A response indicating the registration status.
+        """
         print(f"User {user.id} has registered.")
         result = await send_post_request(
             request, str(user.email), "auth/request-verify-token"
@@ -43,6 +71,13 @@ class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
     async def on_after_forgot_password(
         self, user: User, token: str, request: Optional[Request] = None
     ):
+        """
+        Perform actions after a user requests a password reset.
+
+        :param user (User): The user who requested the password reset.
+        :param token (str): The reset token.
+        :param request (Optional[Request]): The request object (optional).
+        """
         await send_email_for_reset_pswd(
             user.email, user.username, token, request.base_url
         )
@@ -52,6 +87,13 @@ class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
     async def on_after_request_verify(
         self, user: User, token: str, request: Optional[Request] = None
     ):
+        """
+        Perform actions after a user requests email verification.
+
+        :param user (User): The user who requested email verification.
+        :param token (str): The verification token.
+        :param request (Optional[Request]): The request object (optional).
+        """
         await send_email_verification(
             user.email, user.username, token, request.base_url
         )
@@ -59,10 +101,25 @@ class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
 
 
 async def get_user_manager(user_db: SQLAlchemyUserDatabase = Depends(get_user_db)):
+    """
+    The get_user_manager function is a dependency provider that returns an instance of the UserManager class.
+    The UserManager class is responsible for managing users in the database.
+    It provides methods to create, update, and delete users as well as retrieve them by their ID or username.
+
+    :param user_db: SQLAlchemyUserDatabase: Pass the user database instance to the function
+    :return: A UserManager instance
+    """
     yield UserManager(user_db)
 
 
 def get_jwt_strategy() -> JWTStrategy:
+    """
+    The get_jwt_strategy function returns a JWTStrategy object.
+    The JWTStrategy object is initialized with the secret key and lifetime seconds arguments.
+    The secret key argument is set to the value of settings.secret_key, which was imported from settings/base.py.
+
+    :return: A JWTStrategy object
+    """
     return JWTStrategy(secret=settings.secret_key, lifetime_seconds=3600)
 
 

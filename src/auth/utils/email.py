@@ -27,6 +27,16 @@ conf = ConnectionConfig(
 async def send_email_for_reset_pswd(
     email: EmailStr, username: str, reset_token: str, host: str
 ):
+    """
+    Send an email for password reset.
+
+    :param email (EmailStr): The recipient's email address.
+    :param username (str): The username associated with the email.
+    :param reset_token (str): The reset token for password reset.
+    :param host (str): The host URL.
+
+    :raises ConnectionErrors: If there is an issue with the email sending connection.
+    """
     try:
         message = MessageSchema(
             subject="Password change",
@@ -45,6 +55,16 @@ async def send_email_for_reset_pswd(
 async def send_email_verification(
     email: EmailStr, username: str, verify_token: str, host: str
 ):
+    """
+    Send an email for email verification.
+
+    :param email (EmailStr): The recipient's email address.
+    :param username (str): The username associated with the email.
+    :param verify_token (str): The verification token for email confirmation.
+    :param host (str): The host URL.
+
+    :raises ConnectionErrors: If there is an issue with the email sending connection.
+    """
     try:
         message = MessageSchema(
             subject="Confirm your email ",
