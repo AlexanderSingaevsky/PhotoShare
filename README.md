@@ -1,4 +1,6 @@
-# [MEMENTO Exchange](https://MEMENTO.onrender.com/)  src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg"/><span> </span><img align="right" width="32px" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/fastapi/fastapi-original.svg"/></span>
+# [MEMENTO Exchange](https://MEMENTO.onrender.com/) 
+<span><img align="right" width="32px" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg"/></span>
+<span><img align="right" width="32px" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/fastapi/fastapi-original.svg"/></span>
 
 The project is available online at [https://MEMENTO.onrender.com/views/dashboard](https://MEMENTO.onrender.com/views/dashboard)
 
